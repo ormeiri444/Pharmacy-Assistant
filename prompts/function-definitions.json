@@ -1,0 +1,62 @@
+[
+  {
+    "name": "get_medication_by_name",
+    "description": "מחזיר מידע מלא על תרופה לפי שמה בעברית או אנגלית. משמש לקבלת פרטים על תרופה ספציפית כולל מרכיב פעיל, מינון, זמינות במלאי ודרישת מרשם.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "שם התרופה בעברית או אנגלית (לדוגמה: 'נורופן', 'Nurofen', 'אקמול')"
+        },
+        "strength_mg": {
+          "type": "number",
+          "description": "חוזק התרופה במיליגרם (אופציונלי). שימושי כאשר יש מספר חוזקים זמינים"
+        }
+      },
+      "required": ["name"]
+    }
+  },
+  {
+    "name": "search_medications_by_ingredient",
+    "description": "מחפש תרופות לפי מרכיב פעיל. שימושי כאשר הלקוח יודע את המרכיב הפעיל אבל לא את שם התרופה, או רוצה לראות אילו תרופות מכילות מרכיב מסוים.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "ingredient": {
+          "type": "string",
+          "description": "שם המרכיב הפעיל בעברית (לדוגמה: 'איבופרופן', 'פרצטמול', 'אומפרזול')"
+        }
+      },
+      "required": ["ingredient"]
+    }
+  },
+  {
+    "name": "check_prescription_requirement",
+    "description": "בודק האם תרופה דורשת מרשם רופא. מחזיר את דרישת המרשם והקטגוריה החוקית של התרופה.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "שם התרופה בעברית או אנגלית"
+        }
+      },
+      "required": ["name"]
+    }
+  },
+  {
+    "name": "get_alternative_medications",
+    "description": "מחפש תרופות חלופיות לתרופה נתונה. שימושי כאשר תרופה אינה במלאי או כאשר הלקוח מחפש אפשרויות נוספות. מחזיר תרופות עם אותו מרכיב פעיל או מאותה קטגוריה.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "שם התרופה המקורית שעבורה מחפשים תחליפים"
+        }
+      },
+      "required": ["name"]
+    }
+  }
+]

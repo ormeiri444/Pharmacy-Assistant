@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>צ'אט - עוזר רוקח AI</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container chat-container">
+        <header class="chat-header">
+            <button class="btn-back" onclick="location.href='index.html'">← חזרה</button>
+            <h1>💬 צ'אט עם עוזר רוקח</h1>
+            <div class="header-actions">
+                <button class="btn-icon" id="toggleDeveloperMode" title="מצב מפתח">🔧</button>
+                <button class="btn-icon" id="clearChat" title="נקה שיחה">🗑️</button>
+            </div>
+        </header>
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot-message">
+                <div class="message-content">
+                    <p>שלום! אני עוזר רוקח AI. אני יכול לעזור לך עם:</p>
+                    <ul>
+                        <li>מידע על תרופות</li>
+                        <li>בדיקת זמינות במלאי</li>
+                        <li>הסבר על מרכיבים פעילים</li>
+                        <li>דרישות מרשם</li>
+                    </ul>
+                    <p><strong>שים לב:</strong> אני מספק מידע עובדתי בלבד ולא ייעוץ רפואי.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-input-container">
+            <div class="typing-indicator" id="typingIndicator" style="display: none;">
+                <span></span><span></span><span></span>
+            </div>
+            <form class="chat-input-form" id="chatForm">
+                <input 
+                    type="text" 
+                    id="messageInput" 
+                    placeholder="שאל שאלה על תרופה..."
+                    autocomplete="off"
+                    required
+                >
+                <button type="submit" class="btn-send" id="sendButton">
+                    <span>שלח</span>
+                </button>
+            </form>
+        </div>
+
+        <div class="developer-mode" id="developerMode" style="display: none;">
+            <h3>🔧 מצב מפתח</h3>
+            <div id="developerContent"></div>
+        </div>
+    </div>
+
+    <script src="js/mock-api.js"></script>
+    <script src="js/chat-client.js"></script>
+</body>
+</html>
