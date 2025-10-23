@@ -43,10 +43,11 @@ Server running on http://localhost:5001
 ```
 
 ### 4. Open the Voice Interface
-1. Open `frontend/voice.html` in your web browser
-2. Click the "התחל שיחה" (Start Conversation) button
-3. Allow microphone access when prompted
-4. Start speaking in Hebrew!
+1. Open your web browser and navigate to `http://localhost:8080/index.html`
+2. Click on the "ממשק קולי" (Voice Interface) option
+3. Click the "התחל שיחה" (Start Conversation) button
+4. Allow microphone access when prompted
+5. Start speaking in Hebrew!
 
 ## How It Works
 

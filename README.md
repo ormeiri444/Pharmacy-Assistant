@@ -129,14 +129,13 @@ python chat_server.py
 
 ### פתיחת הממשק
 
-פתח את `frontend/index.html` בדפדפן, או השתמש בשרת HTTP פשוט:
+לאחר הפעלת השרת, פתח דפדפן וגש לכתובת:
 
-```bash
-cd frontend
-python -m http.server 8000
+```
+http://localhost:8080/index.html
 ```
 
-גש ל-`http://localhost:8000`
+**שים לב:** השרת מגיש את קבצי הממשק מתיקיית `frontend/` ישירות על פורט 8080.
 
 ## 💡 שימוש
 

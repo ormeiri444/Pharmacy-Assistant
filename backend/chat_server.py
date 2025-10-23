@@ -71,7 +71,7 @@ def index():
             "/realtime/token": "POST - Get ephemeral token for Realtime API",
             "/health": "GET - Health check"
         },
-        "frontend": "Open frontend/index.html in your browser to use the chat interface"
+        "frontend": "Navigate to http://localhost:8080/index.html to use the chat interface"
     })
 
 
