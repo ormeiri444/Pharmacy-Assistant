@@ -3,8 +3,9 @@ Simple Flask server for pharmacy assistant chat
 """
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from openai_client import chat_completion
+from openai_client import chat_completion, get_client
 from dotenv import load_dotenv
+import os
 
 load_dotenv()
 
@@ -35,6 +36,29 @@ def chat():
         }), 500
 
 
+@app.route('/realtime/token', methods=['POST'])
+def get_realtime_token():
+    """Get ephemeral token for OpenAI Realtime API"""
+    try:
+        # For the Realtime API, we need to return the API key itself
+        # as an ephemeral token. In production, you would create a
+        # short-lived token, but for development we use the API key directly.
+        api_key = os.getenv('OPENAI_API_KEY')
+        if not api_key:
+            raise ValueError("OPENAI_API_KEY environment variable is not set")
+        
+        return jsonify({
+            "token": api_key
+        })
+        
+    except Exception as e:
+        print(f"Error getting realtime token: {e}")
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+
+
 @app.route('/', methods=['GET'])
 def index():
     """Root endpoint with API information"""
@@ -44,6 +68,7 @@ def index():
         "status": "running",
         "endpoints": {
             "/chat": "POST - Send chat messages",
+            "/realtime/token": "POST - Get ephemeral token for Realtime API",
             "/health": "GET - Health check"
         },
         "frontend": "Open frontend/index.html in your browser to use the chat interface"

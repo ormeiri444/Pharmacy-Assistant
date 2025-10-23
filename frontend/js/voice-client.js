@@ -1,14 +1,6 @@
 /**
  * Voice Client - handles voice interface using OpenAI Realtime API
- * Note: This requires the OpenAI Realtime API client library
  */
-
-// Configuration
-const OPENAI_API_KEY = 'YOUR_API_KEY_HERE'; // Replace with actual API key
-
-// Load system prompt and functions
-let systemPrompt = '';
-let functions = [];
 
 // DOM Elements
 const startButton = document.getElementById('startButton');
@@ -22,38 +14,23 @@ const developerContent = document.getElementById('developerContent');
 
 let developerModeEnabled = false;
 let isConnected = false;
-let realtimeSession = null;
+let peerConnection = null;
+let dataChannel = null;
+let audioContext = null;
+let mediaStream = null;
+
+// Configuration
+const BACKEND_URL = 'http://localhost:5001';
 
 // Initialize
 document.addEventListener('DOMContentLoaded', async () => {
-    await loadConfiguration();
     startButton.addEventListener('click', startVoiceSession);
     stopButton.addEventListener('click', stopVoiceSession);
     toggleDevModeBtn.addEventListener('click', toggleDeveloperMode);
 });
 
 /**
- * Load system prompt and function definitions
- */
-async function loadConfiguration() {
-    try {
-        // Load system prompt
-        const promptResponse = await fetch('../prompts/system-prompt.txt');
-        systemPrompt = await promptResponse.text();
-        
-        // Load function definitions
-        const functionsResponse = await fetch('../prompts/function-definitions.json');
-        functions = await functionsResponse.json();
-        
-        console.log('Configuration loaded successfully');
-    } catch (error) {
-        console.error('Error loading configuration:', error);
-        updateStatus('❌', 'שגיאה בטעינת הגדרות');
-    }
-}
-
-/**
- * Start voice session
+ * Start voice session with OpenAI Realtime API
  */
 async function startVoiceSession() {
     if (isConnected) return;
@@ -62,11 +39,22 @@ async function startVoiceSession() {
         updateStatus('🔄', 'מתחבר...');
         startButton.style.display = 'none';
         
-        // Note: This is a placeholder for the actual Realtime API implementation
-        // The actual implementation would use: import { RealtimeAgent, RealtimeSession } from "@openai/agents/realtime";
+        // Get ephemeral token from backend
+        const tokenResponse = await fetch(`${BACKEND_URL}/realtime/token`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
         
-        // For now, we'll simulate the connection
-        await simulateRealtimeConnection();
+        if (!tokenResponse.ok) {
+            throw new Error('Failed to get session token');
+        }
+        
+        const { token } = await tokenResponse.json();
+        
+        // Initialize WebRTC connection
+        await initializeRealtimeConnection(token);
         
         isConnected = true;
         updateStatus('🎤', 'מאזין... דבר עכשיו');
@@ -76,8 +64,237 @@ async function startVoiceSession() {
         
     } catch (error) {
         console.error('Error starting voice session:', error);
-        updateStatus('❌', 'שגיאה בהתחברות');
+        updateStatus('❌', 'שגיאה בהתחברות: ' + error.message);
         startButton.style.display = 'block';
+        addTranscription('מערכת: שגיאה - ' + error.message, 'system');
+    }
+}
+
+/**
+ * Initialize WebRTC connection to OpenAI Realtime API
+ */
+async function initializeRealtimeConnection(ephemeralToken) {
+    // Create peer connection
+    peerConnection = new RTCPeerConnection();
+    
+    // Set up audio context for microphone
+    audioContext = new AudioContext({ sampleRate: 24000 });
+    
+    // Get user microphone
+    mediaStream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true
+        }
+    });
+    
+    // Add microphone track to peer connection
+    const audioTrack = mediaStream.getAudioTracks()[0];
+    peerConnection.addTrack(audioTrack);
+    
+    // Set up data channel for events
+    dataChannel = peerConnection.createDataChannel('oai-events');
+    
+    dataChannel.addEventListener('open', () => {
+        console.log('Data channel opened');
+        // Send session configuration
+        sendSessionUpdate();
+    });
+    
+    dataChannel.addEventListener('message', (event) => {
+        handleRealtimeEvent(JSON.parse(event.data));
+    });
+    
+    // Handle incoming audio
+    peerConnection.addEventListener('track', (event) => {
+        const remoteStream = event.streams[0];
+        const audioElement = new Audio();
+        audioElement.srcObject = remoteStream;
+        audioElement.play();
+    });
+    
+    // Create and set local offer
+    const offer = await peerConnection.createOffer();
+    await peerConnection.setLocalDescription(offer);
+    
+    // Send offer to OpenAI with correct model parameter
+    const sdpResponse = await fetch('https://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-10-01', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${ephemeralToken}`,
+            'Content-Type': 'application/sdp'
+        },
+        body: offer.sdp
+    });
+    
+    if (!sdpResponse.ok) {
+        const errorText = await sdpResponse.text();
+        console.error('OpenAI API Error Response:', errorText);
+        console.error('Status:', sdpResponse.status);
+        throw new Error(`Failed to connect to OpenAI Realtime API: ${sdpResponse.status} - ${errorText}`);
+    }
+    
+    const answerSdp = await sdpResponse.text();
+    await peerConnection.setRemoteDescription({
+        type: 'answer',
+        sdp: answerSdp
+    });
+}
+
+/**
+ * Send session configuration to OpenAI
+ */
+function sendSessionUpdate() {
+    const sessionConfig = {
+        type: 'session.update',
+        session: {
+            modalities: ['text', 'audio'],
+            instructions: 'אתה עוזר רוקח וירטואלי. עזור למשתמשים עם שאלות על תרופות, מלאי, ומרכיבים. דבר בעברית.',
+            voice: 'alloy',
+            input_audio_format: 'pcm16',
+            output_audio_format: 'pcm16',
+            input_audio_transcription: {
+                model: 'whisper-1'
+            },
+            turn_detection: {
+                type: 'server_vad',
+                threshold: 0.5,
+                prefix_padding_ms: 300,
+                silence_duration_ms: 500
+            },
+            tools: [
+                {
+                    type: 'function',
+                    name: 'get_medication_by_name',
+                    description: 'חפש תרופה לפי שם',
+                    parameters: {
+                        type: 'object',
+                        properties: {
+                            name: {
+                                type: 'string',
+                                description: 'שם התרופה'
+                            }
+                        },
+                        required: ['name']
+                    }
+                },
+                {
+                    type: 'function',
+                    name: 'check_stock',
+                    description: 'בדוק מלאי של תרופה',
+                    parameters: {
+                        type: 'object',
+                        properties: {
+                            medication_id: {
+                                type: 'string',
+                                description: 'מזהה התרופה'
+                            }
+                        },
+                        required: ['medication_id']
+                    }
+                },
+                {
+                    type: 'function',
+                    name: 'search_by_ingredient',
+                    description: 'חפש תרופות לפי מרכיב פעיל',
+                    parameters: {
+                        type: 'object',
+                        properties: {
+                            ingredient: {
+                                type: 'string',
+                                description: 'שם המרכיב הפעיל'
+                            }
+                        },
+                        required: ['ingredient']
+                    }
+                }
+            ],
+            tool_choice: 'auto',
+            temperature: 0.8
+        }
+    };
+    
+    if (dataChannel && dataChannel.readyState === 'open') {
+        dataChannel.send(JSON.stringify(sessionConfig));
+    }
+}
+
+/**
+ * Handle events from OpenAI Realtime API
+ */
+function handleRealtimeEvent(event) {
+    console.log('Realtime event:', event);
+    
+    switch (event.type) {
+        case 'conversation.item.input_audio_transcription.completed':
+            addTranscription(`משתמש: ${event.transcript}`, 'user');
+            break;
+            
+        case 'response.audio_transcript.delta':
+            // Accumulate transcript deltas
+            if (!window.currentTranscript) {
+                window.currentTranscript = '';
+            }
+            window.currentTranscript += event.delta;
+            break;
+            
+        case 'response.audio_transcript.done':
+            if (window.currentTranscript) {
+                addTranscription(`עוזר: ${window.currentTranscript}`, 'bot');
+                window.currentTranscript = '';
+            }
+            break;
+            
+        case 'response.function_call_arguments.done':
+            if (developerModeEnabled) {
+                showFunctionCall({
+                    name: event.name,
+                    call_id: event.call_id,
+                    arguments: JSON.parse(event.arguments)
+                });
+            }
+            // Execute function and send result
+            executeFunctionCall(event.call_id, event.name, JSON.parse(event.arguments));
+            break;
+            
+        case 'error':
+            console.error('Realtime API error:', event.error);
+            addTranscription(`שגיאה: ${event.error.message}`, 'system');
+            break;
+    }
+}
+
+/**
+ * Execute function call and send result back
+ */
+async function executeFunctionCall(callId, functionName, args) {
+    try {
+        // Call backend to execute function
+        const result = await executeToolCall(functionName, args);
+        
+        // Send result back to OpenAI
+        const functionOutput = {
+            type: 'conversation.item.create',
+            item: {
+                type: 'function_call_output',
+                call_id: callId,
+                output: JSON.stringify(result)
+            }
+        };
+        
+        if (dataChannel && dataChannel.readyState === 'open') {
+            dataChannel.send(JSON.stringify(functionOutput));
+            
+            // Request response generation
+            dataChannel.send(JSON.stringify({ type: 'response.create' }));
+        }
+        
+        if (developerModeEnabled) {
+            showFunctionResult(callId, result);
+        }
+    } catch (error) {
+        console.error('Error executing function:', error);
     }
 }
 
@@ -90,10 +307,28 @@ async function stopVoiceSession() {
     try {
         updateStatus('🔄', 'מתנתק...');
         
-        // Disconnect session
-        if (realtimeSession) {
-            await realtimeSession.disconnect();
-            realtimeSession = null;
+        // Close data channel
+        if (dataChannel) {
+            dataChannel.close();
+            dataChannel = null;
+        }
+        
+        // Close peer connection
+        if (peerConnection) {
+            peerConnection.close();
+            peerConnection = null;
+        }
+        
+        // Stop microphone
+        if (mediaStream) {
+            mediaStream.getTracks().forEach(track => track.stop());
+            mediaStream = null;
+        }
+        
+        // Close audio context
+        if (audioContext) {
+            await audioContext.close();
+            audioContext = null;
         }
         
         isConnected = false;
@@ -106,44 +341,6 @@ async function stopVoiceSession() {
     } catch (error) {
         console.error('Error stopping voice session:', error);
     }
-}
-
-/**
- * Simulate Realtime API connection (placeholder)
- * In production, this would use the actual OpenAI Realtime API
- */
-async function simulateRealtimeConnection() {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            console.log('Simulated connection established');
-            
-            // Simulate receiving transcription
-            setTimeout(() => {
-                addTranscription('משתמש: יש לכם נורופן במלאי?', 'user');
-                
-                // Simulate function call
-                if (developerModeEnabled) {
-                    showFunctionCall({
-                        name: 'get_medication_by_name',
-                        arguments: { name: 'נורופן' },
-                        result: {
-                            success: true,
-                            name: 'נורופן',
-                            in_stock: true,
-                            requires_prescription: false
-                        }
-                    });
-                }
-                
-                // Simulate bot response
-                setTimeout(() => {
-                    addTranscription('עוזר: כן, נורופן זמין במלאי. זו תרופה ללא מרשם למשכך כאבים ונוגד דלקת.', 'bot');
-                }, 1500);
-            }, 2000);
-            
-            resolve();
-        }, 1000);
-    });
 }
 
 /**
@@ -197,12 +394,13 @@ function toggleDeveloperMode() {
 function showFunctionCall(functionCall) {
     const callDiv = document.createElement('div');
     callDiv.style.marginBottom = '15px';
+    callDiv.id = `call-${functionCall.call_id}`;
     
     const callInfo = `
         <strong style="color: #50fa7b;">TOOL CALL:</strong> ${functionCall.name}<br>
+        <strong>Call ID:</strong> ${functionCall.call_id}<br>
         <pre>${JSON.stringify(functionCall.arguments, null, 2)}</pre>
-        <strong style="color: #50fa7b;">TOOL RESPONSE:</strong><br>
-        <pre>${JSON.stringify(functionCall.result, null, 2)}</pre>
+        <div id="result-${functionCall.call_id}"></div>
     `;
     
     callDiv.innerHTML = callInfo;
@@ -210,59 +408,14 @@ function showFunctionCall(functionCall) {
 }
 
 /**
- * Handle function calls from Realtime API
+ * Show function result in developer mode
  */
-function handleFunctionCall(functionName, args) {
-    // Execute the function using mock API
-    const result = executeToolCall(functionName, args);
-    
-    // Show in developer mode
-    if (developerModeEnabled) {
-        showFunctionCall({
-            name: functionName,
-            arguments: args,
-            result: result
-        });
+function showFunctionResult(callId, result) {
+    const resultDiv = document.getElementById(`result-${callId}`);
+    if (resultDiv) {
+        resultDiv.innerHTML = `
+            <strong style="color: #50fa7b;">TOOL RESPONSE:</strong><br>
+            <pre>${JSON.stringify(result, null, 2)}</pre>
+        `;
     }
-    
-    return result;
 }
-
-// Note: To implement the actual Realtime API, you would need to:
-// 1. Install the OpenAI Realtime API client: npm install @openai/agents
-// 2. Import the necessary classes
-// 3. Create a RealtimeAgent with the system prompt and functions
-// 4. Create a RealtimeSession and connect it
-// 5. Handle audio input/output streams
-// 6. Process function calls and responses
-
-// Example implementation structure (commented out):
-/*
-import { RealtimeAgent, RealtimeSession } from "@openai/agents/realtime";
-
-async function startVoiceSession() {
-    const agent = new RealtimeAgent({
-        name: "Pharmacy Assistant",
-        instructions: systemPrompt,
-        functions: functions
-    });
-    
-    realtimeSession = new RealtimeSession(agent);
-    
-    // Handle function calls
-    realtimeSession.on('function_call', async (call) => {
-        const result = handleFunctionCall(call.name, call.arguments);
-        return result;
-    });
-    
-    // Handle transcription
-    realtimeSession.on('transcription', (text, speaker) => {
-        addTranscription(`${speaker}: ${text}`, speaker === 'user' ? 'user' : 'bot');
-    });
-    
-    // Connect with API key
-    await realtimeSession.connect({
-        apiKey: OPENAI_API_KEY
-    });
-}
-*/
