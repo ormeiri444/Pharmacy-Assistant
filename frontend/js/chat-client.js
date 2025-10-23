@@ -62,6 +62,13 @@ async function handleSubmit(e) {
         const data = await response.json();
         
         if (data.success) {
+            // Show tool calls in chat (for all users)
+            if (data.tool_calls) {
+                data.tool_calls.forEach(toolCall => {
+                    showToolCallInChat(toolCall);
+                });
+            }
+            
             // Add bot response to UI
             addMessage(data.message, 'bot');
             
@@ -195,4 +202,82 @@ function showToolCall(toolCall) {
     
     // Scroll developer content to bottom
     developerContent.scrollTop = developerContent.scrollHeight;
+}
+
+/**
+ * Show tool call in main chat area
+ */
+function showToolCallInChat(toolCall) {
+    const callDiv = document.createElement('div');
+    callDiv.className = 'message tool-call-message';
+    callDiv.style.backgroundColor = '#f8f9fa';
+    callDiv.style.border = '1px solid #dee2e6';
+    callDiv.style.borderRadius = '12px';
+    callDiv.style.padding = '15px';
+    callDiv.style.margin = '10px 0';
+    
+    const callHeader = document.createElement('div');
+    callHeader.style.fontWeight = 'bold';
+    callHeader.style.color = '#6c757d';
+    callHeader.style.marginBottom = '10px';
+    callHeader.style.fontSize = '14px';
+    callHeader.innerHTML = `🔧 קריאה לפונקציה: <span style="color: #0066cc;">${toolCall.name}</span>`;
+    
+    const inputSection = document.createElement('div');
+    inputSection.style.marginBottom = '10px';
+    
+    const inputLabel = document.createElement('div');
+    inputLabel.style.fontWeight = 'bold';
+    inputLabel.style.color = '#495057';
+    inputLabel.style.marginBottom = '5px';
+    inputLabel.style.fontSize = '13px';
+    inputLabel.textContent = 'קלט (Input):';
+    
+    const inputContent = document.createElement('pre');
+    inputContent.style.backgroundColor = '#ffffff';
+    inputContent.style.border = '1px solid #e9ecef';
+    inputContent.style.borderRadius = '6px';
+    inputContent.style.padding = '10px';
+    inputContent.style.margin = '0';
+    inputContent.style.fontSize = '12px';
+    inputContent.style.overflow = 'auto';
+    inputContent.style.direction = 'ltr';
+    inputContent.style.textAlign = 'left';
+    inputContent.style.fontFamily = 'monospace';
+    inputContent.textContent = JSON.stringify(toolCall.arguments, null, 2);
+    
+    inputSection.appendChild(inputLabel);
+    inputSection.appendChild(inputContent);
+    
+    const outputSection = document.createElement('div');
+    
+    const outputLabel = document.createElement('div');
+    outputLabel.style.fontWeight = 'bold';
+    outputLabel.style.color = '#28a745';
+    outputLabel.style.marginBottom = '5px';
+    outputLabel.style.fontSize = '13px';
+    outputLabel.textContent = '✅ פלט (Output):';
+    
+    const outputContent = document.createElement('pre');
+    outputContent.style.backgroundColor = '#ffffff';
+    outputContent.style.border = '1px solid #e9ecef';
+    outputContent.style.borderRadius = '6px';
+    outputContent.style.padding = '10px';
+    outputContent.style.margin = '0';
+    outputContent.style.fontSize = '12px';
+    outputContent.style.overflow = 'auto';
+    outputContent.style.direction = 'ltr';
+    outputContent.style.textAlign = 'left';
+    outputContent.style.fontFamily = 'monospace';
+    outputContent.textContent = JSON.stringify(toolCall.result, null, 2);
+    
+    outputSection.appendChild(outputLabel);
+    outputSection.appendChild(outputContent);
+    
+    callDiv.appendChild(callHeader);
+    callDiv.appendChild(inputSection);
+    callDiv.appendChild(outputSection);
+    
+    chatMessages.appendChild(callDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
 }

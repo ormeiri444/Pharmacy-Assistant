@@ -27,7 +27,10 @@ def load_system_prompt():
     """Load system prompt from file"""
     global _system_prompt
     if _system_prompt is None:
-        with open('../prompts/system-prompt.txt', 'r', encoding='utf-8') as f:
+        # Get the directory of this file
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        prompt_path = os.path.join(current_dir, '..', 'prompts', 'system-prompt.txt')
+        with open(prompt_path, 'r', encoding='utf-8') as f:
             _system_prompt = f.read()
     return _system_prompt
 
@@ -36,7 +39,10 @@ def load_function_definitions():
     """Load function definitions from file"""
     global _functions
     if _functions is None:
-        with open('../prompts/function-definitions.json', 'r', encoding='utf-8') as f:
+        # Get the directory of this file
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        functions_path = os.path.join(current_dir, '..', 'prompts', 'function-definitions.json')
+        with open(functions_path, 'r', encoding='utf-8') as f:
             _functions = json.load(f)
     return _functions
 

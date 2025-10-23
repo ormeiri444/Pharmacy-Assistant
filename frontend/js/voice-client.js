@@ -247,6 +247,13 @@ function handleRealtimeEvent(event) {
             break;
             
         case 'response.function_call_arguments.done':
+            // Show function call in transcription
+            showFunctionCallInTranscription({
+                name: event.name,
+                call_id: event.call_id,
+                arguments: JSON.parse(event.arguments)
+            });
+            
             if (developerModeEnabled) {
                 showFunctionCall({
                     name: event.name,
@@ -289,6 +296,9 @@ async function executeFunctionCall(callId, functionName, args) {
             // Request response generation
             dataChannel.send(JSON.stringify({ type: 'response.create' }));
         }
+        
+        // Show result in transcription
+        showFunctionResultInTranscription(callId, result);
         
         if (developerModeEnabled) {
             showFunctionResult(callId, result);
@@ -417,5 +427,79 @@ function showFunctionResult(callId, result) {
             <strong style="color: #50fa7b;">TOOL RESPONSE:</strong><br>
             <pre>${JSON.stringify(result, null, 2)}</pre>
         `;
+    }
+}
+
+/**
+ * Show function call in transcription area
+ */
+function showFunctionCallInTranscription(functionCall) {
+    const callDiv = document.createElement('div');
+    callDiv.style.backgroundColor = '#f8f9fa';
+    callDiv.style.border = '1px solid #dee2e6';
+    callDiv.style.borderRadius = '8px';
+    callDiv.style.padding = '12px';
+    callDiv.style.marginTop = '10px';
+    callDiv.style.marginBottom = '10px';
+    callDiv.id = `transcription-call-${functionCall.call_id}`;
+    
+    const callHeader = document.createElement('div');
+    callHeader.style.fontWeight = 'bold';
+    callHeader.style.color = '#6c757d';
+    callHeader.style.marginBottom = '8px';
+    callHeader.innerHTML = `🔧 קריאה לפונקציה: ${functionCall.name}`;
+    
+    const callArgs = document.createElement('pre');
+    callArgs.style.backgroundColor = '#ffffff';
+    callArgs.style.border = '1px solid #e9ecef';
+    callArgs.style.borderRadius = '4px';
+    callArgs.style.padding = '8px';
+    callArgs.style.margin = '0';
+    callArgs.style.fontSize = '12px';
+    callArgs.style.overflow = 'auto';
+    callArgs.style.direction = 'ltr';
+    callArgs.style.textAlign = 'left';
+    callArgs.textContent = JSON.stringify(functionCall.arguments, null, 2);
+    
+    const resultPlaceholder = document.createElement('div');
+    resultPlaceholder.id = `transcription-result-${functionCall.call_id}`;
+    resultPlaceholder.style.marginTop = '8px';
+    
+    callDiv.appendChild(callHeader);
+    callDiv.appendChild(callArgs);
+    callDiv.appendChild(resultPlaceholder);
+    
+    transcription.appendChild(callDiv);
+    transcription.scrollTop = transcription.scrollHeight;
+}
+
+/**
+ * Show function result in transcription area
+ */
+function showFunctionResultInTranscription(callId, result) {
+    const resultDiv = document.getElementById(`transcription-result-${callId}`);
+    if (resultDiv) {
+        const resultHeader = document.createElement('div');
+        resultHeader.style.fontWeight = 'bold';
+        resultHeader.style.color = '#28a745';
+        resultHeader.style.marginBottom = '4px';
+        resultHeader.innerHTML = '✅ תוצאה:';
+        
+        const resultContent = document.createElement('pre');
+        resultContent.style.backgroundColor = '#ffffff';
+        resultContent.style.border = '1px solid #e9ecef';
+        resultContent.style.borderRadius = '4px';
+        resultContent.style.padding = '8px';
+        resultContent.style.margin = '0';
+        resultContent.style.fontSize = '12px';
+        resultContent.style.overflow = 'auto';
+        resultContent.style.direction = 'ltr';
+        resultContent.style.textAlign = 'left';
+        resultContent.textContent = JSON.stringify(result, null, 2);
+        
+        resultDiv.appendChild(resultHeader);
+        resultDiv.appendChild(resultContent);
+        
+        transcription.scrollTop = transcription.scrollHeight;
     }
 }
