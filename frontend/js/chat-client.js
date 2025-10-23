@@ -71,9 +71,11 @@ async function handleSubmit(e) {
                 content: data.message
             });
             
-            // Show function call in developer mode
-            if (data.function_call && developerModeEnabled) {
-                showFunctionCall(data.function_call);
+            // Show tool calls in developer mode
+            if (data.tool_calls && developerModeEnabled) {
+                data.tool_calls.forEach(toolCall => {
+                    showToolCall(toolCall);
+                });
             }
         } else {
             addMessage('מצטער, אירעה שגיאה. אנא נסה שוב.', 'bot');
@@ -163,19 +165,34 @@ function toggleDeveloperMode() {
 }
 
 /**
- * Show function call in developer mode
+ * Show tool call in developer mode
  */
-function showFunctionCall(functionCall) {
+function showToolCall(toolCall) {
     const callDiv = document.createElement('div');
-    callDiv.style.marginBottom = '15px';
+    callDiv.style.marginBottom = '20px';
+    callDiv.style.padding = '15px';
+    callDiv.style.backgroundColor = '#1e1e1e';
+    callDiv.style.borderRadius = '8px';
+    callDiv.style.border = '1px solid #50fa7b';
     
     const callInfo = `
-        <strong style="color: #50fa7b;">TOOL CALL:</strong> ${functionCall.name}<br>
-        <pre>${JSON.stringify(functionCall.arguments, null, 2)}</pre>
-        <strong style="color: #50fa7b;">TOOL RESPONSE:</strong><br>
-        <pre>${JSON.stringify(functionCall.result, null, 2)}</pre>
+        <div style="margin-bottom: 10px;">
+            <strong style="color: #50fa7b; font-size: 14px;">🔧 TOOL CALL:</strong>
+            <span style="color: #8be9fd; font-weight: bold;">${toolCall.name}</span>
+        </div>
+        <div style="margin-bottom: 10px;">
+            <strong style="color: #f1fa8c;">Parameters:</strong>
+            <pre style="background: #282a36; padding: 10px; border-radius: 4px; margin-top: 5px; overflow-x: auto;">${JSON.stringify(toolCall.arguments, null, 2)}</pre>
+        </div>
+        <div>
+            <strong style="color: #50fa7b;">✅ TOOL RESPONSE:</strong>
+            <pre style="background: #282a36; padding: 10px; border-radius: 4px; margin-top: 5px; overflow-x: auto;">${JSON.stringify(toolCall.result, null, 2)}</pre>
+        </div>
     `;
     
     callDiv.innerHTML = callInfo;
     developerContent.appendChild(callDiv);
+    
+    // Scroll developer content to bottom
+    developerContent.scrollTop = developerContent.scrollHeight;
 }

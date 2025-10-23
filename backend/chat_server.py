@@ -26,10 +26,13 @@ def chat():
         return jsonify({
             "success": True,
             "message": result['message'],
-            "function_call": result.get('function_call')
+            "tool_calls": result.get('tool_calls')
         })
         
     except Exception as e:
+        print(f"Error in chat endpoint: {e}")
+        import traceback
+        traceback.print_exc()
         return jsonify({
             "success": False,
             "error": str(e)

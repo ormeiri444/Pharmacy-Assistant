@@ -389,27 +389,60 @@ header h1 {
 
 /* Developer Mode */
 .developer-mode {
-    background: #2d2d2d;
+    background: #1e1e1e;
     color: #f8f8f2;
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 20px;
     margin-top: 20px;
     font-family: 'Courier New', monospace;
-    max-height: 400px;
+    max-height: 500px;
     overflow-y: auto;
+    border: 2px solid #50fa7b;
+    box-shadow: 0 4px 12px rgba(80, 250, 123, 0.2);
 }
 
 .developer-mode h3 {
     color: #50fa7b;
     margin-bottom: 15px;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .developer-mode pre {
-    background: #1e1e1e;
-    padding: 15px;
+    background: #282a36;
+    padding: 12px;
     border-radius: 6px;
     overflow-x: auto;
-    margin: 10px 0;
+    margin: 8px 0;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    border: 1px solid #44475a;
+}
+
+#developerContent {
+    direction: ltr;
+    text-align: left;
+}
+
+/* Scrollbar styling for developer mode */
+.developer-mode::-webkit-scrollbar {
+    width: 8px;
+}
+
+.developer-mode::-webkit-scrollbar-track {
+    background: #282a36;
+    border-radius: 4px;
+}
+
+.developer-mode::-webkit-scrollbar-thumb {
+    background: #50fa7b;
+    border-radius: 4px;
+}
+
+.developer-mode::-webkit-scrollbar-thumb:hover {
+    background: #6dffaa;
 }
 
 /* Info Box */

@@ -48,62 +48,83 @@ def chat_completion(messages):
     """
     client = get_client()
     system_prompt = load_system_prompt()
-    functions = load_function_definitions()
+    function_definitions = load_function_definitions()
+    
+    # Convert function definitions to tools format
+    tools = [
+        {
+            "type": "function",
+            "function": func
+        }
+        for func in function_definitions
+    ]
     
     # Add system prompt if not present
     if not messages or messages[0].get('role') != 'system':
         messages.insert(0, {"role": "system", "content": system_prompt})
     
-    # Call OpenAI API
+    # Call OpenAI API with tools
     response = client.chat.completions.create(
-        model="gpt-4",
+        model="gpt-4o",
         messages=messages,
-        functions=functions,
-        function_call="auto"
+        tools=tools,
+        tool_choice="auto"
     )
     
     message = response.choices[0].message
     
-    # Check if function call is needed
-    if message.function_call:
-        function_name = message.function_call.name
-        function_args = json.loads(message.function_call.arguments)
+    # Check if tool calls are needed
+    if message.tool_calls:
+        # Process all tool calls
+        tool_call_results = []
         
-        # Execute function
-        function_result = execute_function(function_name, function_args)
-        
-        # Add function call and result to messages
-        messages.append({
-            "role": "assistant",
-            "content": None,
-            "function_call": {
+        for tool_call in message.tool_calls:
+            function_name = tool_call.function.name
+            function_args = json.loads(tool_call.function.arguments)
+            
+            # Execute function
+            function_result = execute_function(function_name, function_args)
+            
+            tool_call_results.append({
                 "name": function_name,
-                "arguments": message.function_call.arguments
-            }
-        })
-        
-        messages.append({
-            "role": "function",
-            "name": function_name,
-            "content": json.dumps(function_result, ensure_ascii=False)
-        })
+                "arguments": function_args,
+                "result": function_result
+            })
+            
+            # Add tool call result to messages
+            messages.append({
+                "role": "assistant",
+                "content": None,
+                "tool_calls": [
+                    {
+                        "id": tool_call.id,
+                        "type": "function",
+                        "function": {
+                            "name": function_name,
+                            "arguments": tool_call.function.arguments
+                        }
+                    }
+                ]
+            })
+            
+            messages.append({
+                "role": "tool",
+                "tool_call_id": tool_call.id,
+                "content": json.dumps(function_result, ensure_ascii=False)
+            })
         
         # Get final response
         second_response = client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4o",
             messages=messages
         )
         
         return {
             "message": second_response.choices[0].message.content,
-            "function_call": {
-                "name": function_name,
-                "arguments": function_args,
-                "result": function_result
-            }
+            "tool_calls": tool_call_results
         }
     
     return {
         "message": message.content,
-        "function_call": None
+        "tool_calls": None
     }
