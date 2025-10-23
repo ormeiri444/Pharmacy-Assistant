@@ -1,7 +1,7 @@
 """
 Simple Flask server for pharmacy assistant chat
 """
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from openai_client import chat_completion, get_client
 from dotenv import load_dotenv
@@ -9,7 +9,8 @@ import os
 
 load_dotenv()
 
-app = Flask(__name__)
+# Set the static folder to the frontend directory
+app = Flask(__name__, static_folder='../frontend', static_url_path='')
 CORS(app)
 
 
@@ -62,9 +63,21 @@ def get_realtime_token():
         }), 500
 
 
-@app.route('/', methods=['GET'])
-def index():
-    """Root endpoint with API information"""
+@app.route('/')
+def serve_index():
+    """Serve the main index.html page"""
+    return send_from_directory(app.static_folder, 'index.html')
+
+
+@app.route('/<path:path>')
+def serve_static(path):
+    """Serve static files from frontend directory"""
+    return send_from_directory(app.static_folder, path)
+
+
+@app.route('/api', methods=['GET'])
+def api_info():
+    """API information endpoint"""
     return jsonify({
         "name": "Pharmacy Assistant Chat API",
         "version": "1.0.0",
@@ -73,8 +86,7 @@ def index():
             "/chat": "POST - Send chat messages",
             "/realtime/token": "POST - Get ephemeral token for Realtime API",
             "/health": "GET - Health check"
-        },
-        "frontend": "Navigate to http://localhost:8080/index.html to use the chat interface"
+        }
     })
 
 
@@ -86,5 +98,6 @@ def health():
 
 if __name__ == '__main__':
     print("Starting Pharmacy Assistant Chat Server...")
-    print("Server running on http://localhost:5001")
-    app.run(debug=True, port=5001)
+    print("Server running on http://localhost:8080")
+    print("Frontend available at http://localhost:8080/index.html")
+    app.run(debug=True, port=8080, host='0.0.0.0')

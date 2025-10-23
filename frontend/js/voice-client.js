@@ -20,7 +20,7 @@ let audioContext = null;
 let mediaStream = null;
 
 // Configuration
-const BACKEND_URL = 'http://localhost:5001';
+const BACKEND_URL = 'http://localhost:8080';
 
 // Initialize
 document.addEventListener('DOMContentLoaded', async () => {

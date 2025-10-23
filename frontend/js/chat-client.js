@@ -2,7 +2,7 @@
  * Chat Client - handles chat interface and communication with backend
  */
 
-const API_URL = 'http://localhost:5001';
+const API_URL = 'http://localhost:8080';
 let conversationHistory = [];
 let developerModeEnabled = false;
 
