@@ -78,25 +78,29 @@ def chat_completion(messages):
     )
     
     message = response.choices[0].message
-    
-    # Check if tool calls are needed
-    if message.tool_calls:
-        # Process all tool calls
-        tool_call_results = []
-        
+
+    # Agentic loop: Allow multiple rounds of tool calling
+    all_tool_call_results = []
+    max_iterations = 5  # Prevent infinite loops
+    iteration = 0
+
+    while message.tool_calls and iteration < max_iterations:
+        iteration += 1
+
+        # Process all tool calls in this round
         for tool_call in message.tool_calls:
             function_name = tool_call.function.name
             function_args = json.loads(tool_call.function.arguments)
-            
+
             # Execute function
             function_result = execute_function(function_name, function_args)
-            
-            tool_call_results.append({
+
+            all_tool_call_results.append({
                 "name": function_name,
                 "arguments": function_args,
                 "result": function_result
             })
-            
+
             # Add tool call result to messages
             messages.append({
                 "role": "assistant",
@@ -112,25 +116,25 @@ def chat_completion(messages):
                     }
                 ]
             })
-            
+
             messages.append({
                 "role": "tool",
                 "tool_call_id": tool_call.id,
                 "content": json.dumps(function_result, ensure_ascii=False)
             })
-        
-        # Get final response
-        second_response = client.chat.completions.create(
+
+        # Get next response (may trigger more tool calls or provide final answer)
+        next_response = client.chat.completions.create(
             model="gpt-4o",
-            messages=messages
+            messages=messages,
+            tools=tools,
+            tool_choice="auto"
         )
-        
-        return {
-            "message": second_response.choices[0].message.content,
-            "tool_calls": tool_call_results
-        }
-    
+
+        message = next_response.choices[0].message
+
+    # Return final message and all tool calls made
     return {
         "message": message.content,
-        "tool_calls": None
+        "tool_calls": all_tool_call_results if all_tool_call_results else None
     }

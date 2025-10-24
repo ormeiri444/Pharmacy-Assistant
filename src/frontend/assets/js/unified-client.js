@@ -132,6 +132,54 @@ function toggleAudio() {
 }
 
 /**
+ * Strip markdown formatting from text for speech
+ */
+function stripMarkdownForSpeech(text) {
+    // Decode HTML entities first
+    const textarea = document.createElement('textarea');
+    textarea.innerHTML = text;
+    text = textarea.value;
+
+    // Remove **bold** markers
+    text = text.replace(/\*\*(.*?)\*\*/g, '$1');
+
+    // Remove *italic* markers
+    text = text.replace(/\*(.*?)\*/g, '$1');
+
+    // Remove bullet points and list markers at start of lines
+    text = text.replace(/^[•\-\*]\s+/gm, '');
+    text = text.replace(/^\d+\.\s+/gm, ''); // Remove numbered lists (1. 2. etc)
+
+    // Remove other common markdown symbols
+    text = text.replace(/[_~`#]/g, '');
+
+    // Clean up escaped quotes
+    text = text.replace(/\\"/g, '');
+    text = text.replace(/\\'/g, '');
+
+    // Replace special punctuation that Hebrew TTS reads incorrectly
+    // Replace em-dash and en-dash with space
+    text = text.replace(/[–—]/g, ' ');
+
+    // Replace quotes with nothing (they're usually decorative in Hebrew)
+    text = text.replace(/["״""''׳]/g, '');
+
+    // Replace colons with comma for natural pause
+    text = text.replace(/:/g, ',');
+
+    // Replace hyphens between words with space (but keep in dates/numbers)
+    text = text.replace(/\s-\s/g, ' ');
+
+    // Clean up multiple spaces
+    text = text.replace(/\s+/g, ' ');
+
+    // Clean up multiple commas
+    text = text.replace(/,+/g, ',');
+
+    return text.trim();
+}
+
+/**
  * Speak text using Web Speech Synthesis API
  */
 function speakText(text) {
@@ -140,8 +188,11 @@ function speakText(text) {
     // Cancel any ongoing speech
     speechSynthesis.cancel();
 
+    // Strip markdown formatting for clean speech
+    const cleanText = stripMarkdownForSpeech(text);
+
     // Create utterance
-    const utterance = new SpeechSynthesisUtterance(text);
+    const utterance = new SpeechSynthesisUtterance(cleanText);
     utterance.lang = 'he-IL'; // Hebrew
     utterance.rate = 0.9; // Slightly slower for clarity
     utterance.pitch = 1.0;
