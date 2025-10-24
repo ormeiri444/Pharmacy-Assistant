@@ -49,6 +49,97 @@ MEDICATIONS_DB = [
     }
 ]
 
+# User medical records database (simulated)
+# In production, this should be stored in a secure database with proper encryption
+USER_MEDICAL_RECORDS = {
+    "123456789": {  # Example user ID
+        "name": "יוסי כהן",
+        "verified": False,  # Will be set to True after ID verification
+        "prescriptions": [
+            {
+                "medication": "ונטולין",
+                "dosage": "100 מק\"ג",
+                "frequency": "2 שאיפות לפי הצורך",
+                "prescribed_date": "2024-01-15",
+                "doctor": "ד\"ר שרה לוי",
+                "active": True
+            },
+            {
+                "medication": "ליפיטור",
+                "dosage": "20 מ\"ג",
+                "frequency": "פעם ביום בערב",
+                "prescribed_date": "2023-11-20",
+                "doctor": "ד\"ר דוד כהן",
+                "active": True
+            }
+        ],
+        "drug_history": [
+            {
+                "medication": "אקמול",
+                "date": "2024-02-10",
+                "reason": "כאב ראש",
+                "duration": "3 ימים"
+            },
+            {
+                "medication": "נורופן",
+                "date": "2024-01-25",
+                "reason": "כאבי שרירים",
+                "duration": "5 ימים"
+            },
+            {
+                "medication": "אנטיביוטיקה (אמוקסיצילין)",
+                "date": "2023-12-05",
+                "reason": "דלקת גרון",
+                "duration": "7 ימים"
+            }
+        ],
+        "allergies": [
+            {
+                "substance": "פניצילין",
+                "severity": "בינונית",
+                "reaction": "פריחה בעור",
+                "diagnosed_date": "2015-06-10"
+            },
+            {
+                "substance": "אספירין",
+                "severity": "קלה",
+                "reaction": "גירוי קיבה",
+                "diagnosed_date": "2018-03-15"
+            }
+        ]
+    },
+    "987654321": {  # Another example user
+        "name": "מרים לוי",
+        "verified": False,
+        "prescriptions": [
+            {
+                "medication": "גלוקופאג'",
+                "dosage": "850 מ\"ג",
+                "frequency": "פעמיים ביום",
+                "prescribed_date": "2023-08-10",
+                "doctor": "ד\"ר משה אברהם",
+                "active": True
+            }
+        ],
+        "drug_history": [
+            {
+                "medication": "אופטלגין",
+                "date": "2024-01-05",
+                "reason": "מיגרנה",
+                "duration": "2 ימים"
+            }
+        ],
+        "allergies": [
+            {
+                "substance": "לקטוז",
+                "severity": "קלה",
+                "reaction": "אי נוחות במערכת העיכול",
+                "diagnosed_date": "2010-05-20"
+            }
+        ]
+    }
+}
+
 
 def get_medication_by_name(name, strength_mg=None):
     """Get medication information by name"""
@@ -180,6 +271,155 @@ def get_alternative_medications(name):
     }
 
 
+def verify_user_id(user_id):
+    """
+    Verify user ID and mark user as verified.
+    In production, this would involve proper authentication (OTP, biometrics, etc.)
+    """
+    user_id = str(user_id).strip()
+
+    if user_id not in USER_MEDICAL_RECORDS:
+        return {
+            "success": False,
+            "error": "user_not_found",
+            "message": "תעודת הזהות לא נמצאה במערכת. אנא פנה לרוקח.",
+            "verified": False
+        }
+
+    # Mark user as verified
+    USER_MEDICAL_RECORDS[user_id]["verified"] = True
+
+    return {
+        "success": True,
+        "verified": True,
+        "user_name": USER_MEDICAL_RECORDS[user_id]["name"],
+        "message": f"שלום {USER_MEDICAL_RECORDS[user_id]['name']}, זיהינו אותך בהצלחה."
+    }
+
+
+def get_user_prescriptions(user_id):
+    """
+    Get user's active prescriptions.
+    Requires prior verification via verify_user_id.
+    """
+    user_id = str(user_id).strip()
+
+    if user_id not in USER_MEDICAL_RECORDS:
+        return {
+            "success": False,
+            "error": "user_not_found",
+            "message": "משתמש לא נמצא במערכת."
+        }
+
+    user_record = USER_MEDICAL_RECORDS[user_id]
+
+    if not user_record.get("verified", False):
+        return {
+            "success": False,
+            "error": "not_verified",
+            "message": "יש לאמת זהות לפני צפייה במידע רפואי אישי.",
+            "requires_verification": True
+        }
+
+    active_prescriptions = [p for p in user_record["prescriptions"] if p.get("active", True)]
+
+    if not active_prescriptions:
+        return {
+            "success": True,
+            "prescriptions": [],
+            "message": "אין מרשמים פעילים כרגע."
+        }
+
+    return {
+        "success": True,
+        "user_name": user_record["name"],
+        "prescriptions": active_prescriptions,
+        "count": len(active_prescriptions)
+    }
+
+
+def get_user_drug_history(user_id):
+    """
+    Get user's drug usage history.
+    Requires prior verification via verify_user_id.
+    """
+    user_id = str(user_id).strip()
+
+    if user_id not in USER_MEDICAL_RECORDS:
+        return {
+            "success": False,
+            "error": "user_not_found",
+            "message": "משתמש לא נמצא במערכת."
+        }
+
+    user_record = USER_MEDICAL_RECORDS[user_id]
+
+    if not user_record.get("verified", False):
+        return {
+            "success": False,
+            "error": "not_verified",
+            "message": "יש לאמת זהות לפני צפייה במידע רפואי אישי.",
+            "requires_verification": True
+        }
+
+    drug_history = user_record.get("drug_history", [])
+
+    if not drug_history:
+        return {
+            "success": True,
+            "drug_history": [],
+            "message": "אין היסטוריית שימוש בתרופות במערכת."
+        }
+
+    return {
+        "success": True,
+        "user_name": user_record["name"],
+        "drug_history": drug_history,
+        "count": len(drug_history)
+    }
+
+
+def get_user_allergies(user_id):
+    """
+    Get user's known allergies.
+    Requires prior verification via verify_user_id.
+    """
+    user_id = str(user_id).strip()
+
+    if user_id not in USER_MEDICAL_RECORDS:
+        return {
+            "success": False,
+            "error": "user_not_found",
+            "message": "משתמש לא נמצא במערכת."
+        }
+
+    user_record = USER_MEDICAL_RECORDS[user_id]
+
+    if not user_record.get("verified", False):
+        return {
+            "success": False,
+            "error": "not_verified",
+            "message": "יש לאמת זהות לפני צפייה במידע רפואי אישי.",
+            "requires_verification": True
+        }
+
+    allergies = user_record.get("allergies", [])
+
+    if not allergies:
+        return {
+            "success": True,
+            "allergies": [],
+            "message": "אין אלרגיות ידועות במערכת."
+        }
+
+    return {
+        "success": True,
+        "user_name": user_record["name"],
+        "allergies": allergies,
+        "count": len(allergies)
+    }
+
+
 def execute_function(function_name, arguments):
     """Execute a function call"""
     if function_name == 'get_medication_by_name':
@@ -190,5 +430,13 @@ def execute_function(function_name, arguments):
         return check_prescription_requirement(arguments['name'])
     elif function_name == 'get_alternative_medications':
         return get_alternative_medications(arguments['name'])
+    elif function_name == 'verify_user_id':
+        return verify_user_id(arguments['user_id'])
+    elif function_name == 'get_user_prescriptions':
+        return get_user_prescriptions(arguments['user_id'])
+    elif function_name == 'get_user_drug_history':
+        return get_user_drug_history(arguments['user_id'])
+    elif function_name == 'get_user_allergies':
+        return get_user_allergies(arguments['user_id'])
     else:
         return {"success": False, "error": "unknown_function"}

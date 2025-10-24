@@ -58,5 +58,61 @@
       },
       "required": ["name"]
     }
+  },
+  {
+    "name": "verify_user_id",
+    "description": "מאמת זהות משתמש על פי מספר תעודת זהות. כלי זה חייב להיקרא לפני גישה למידע רפואי אישי כמו מרשמים, היסטוריית שימוש בתרופות או אלרגיות. קרא לכלי זה כאשר משתמש מבקש מידע אישי או רפואי.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string",
+          "description": "מספר תעודת הזהות של המשתמש (9 ספרות)"
+        }
+      },
+      "required": ["user_id"]
+    }
+  },
+  {
+    "name": "get_user_prescriptions",
+    "description": "מחזיר רשימת מרשמים פעילים של משתמש. דורש אימות זהות מראש באמצעות verify_user_id. משמש כאשר משתמש שואל על המרשמים שלו, התרופות שנרשמו לו, או מה הרופא רשם לו.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string",
+          "description": "מספר תעודת הזהות של המשתמש (9 ספרות)"
+        }
+      },
+      "required": ["user_id"]
+    }
+  },
+  {
+    "name": "get_user_drug_history",
+    "description": "מחזיר היסטוריית שימוש בתרופות של משתמש. דורש אימות זהות מראש באמצעות verify_user_id. משמש כאשר משתמש שואל על תרופות שלקח בעבר, היסטוריה רפואית, או שימושים קודמים.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string",
+          "description": "מספר תעודת הזהות של המשתמש (9 ספרות)"
+        }
+      },
+      "required": ["user_id"]
+    }
+  },
+  {
+    "name": "get_user_allergies",
+    "description": "מחזיר רשימת אלרגיות ידועות של משתמש. דורש אימות זהות מראש באמצעות verify_user_id. משמש כאשר משתמש שואל על האלרגיות שלו, חומרים שהוא רגיש אליהם, או תגובות שליליות שהיו לו.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string",
+          "description": "מספר תעודת הזהות של המשתמש (9 ספרות)"
+        }
+      },
+      "required": ["user_id"]
+    }
   }
 ]
