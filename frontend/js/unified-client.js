@@ -88,9 +88,17 @@ function initializeSpeechRecognition() {
 
 /**
  * Toggle voice input
+ * If LLM is speaking, stop the audio and start listening
  */
 function toggleVoiceInput() {
     if (!recognition) return;
+
+    // If currently speaking, stop the speech
+    if (speechSynthesis.speaking) {
+        speechSynthesis.cancel();
+        const indicator = document.getElementById('audioIndicator');
+        if (indicator) indicator.remove();
+    }
 
     if (isRecording) {
         recognition.stop();
@@ -165,17 +173,35 @@ function speakText(text) {
         `;
         audioIndicator.textContent = '🔊 מדבר...';
         document.body.appendChild(audioIndicator);
+
+        // Update mic button to show it can interrupt
+        if (!isRecording) {
+            voiceIcon.textContent = '⏸️';
+            voiceInputBtn.title = 'לחץ להפסקת הדיבור ולהתחלת הקלטה';
+        }
     };
 
     utterance.onend = () => {
         const indicator = document.getElementById('audioIndicator');
         if (indicator) indicator.remove();
+
+        // Reset mic button
+        if (!isRecording) {
+            voiceIcon.textContent = '🎤';
+            voiceInputBtn.title = 'דיבור';
+        }
     };
 
     utterance.onerror = (event) => {
         console.error('Speech synthesis error:', event.error);
         const indicator = document.getElementById('audioIndicator');
         if (indicator) indicator.remove();
+
+        // Reset mic button
+        if (!isRecording) {
+            voiceIcon.textContent = '🎤';
+            voiceInputBtn.title = 'דיבור';
+        }
     };
 
     speechSynthesis.speak(utterance);
