@@ -1,6 +1,6 @@
 # 🏥 Pharmacy Assistant AI - עוזר רוקח AI
 
-עוזר רוקח AI מבוסס בינה מלאכותית לרשת בתי מרקחת. המערכת מספקת מידע עובדתי על תרופות דרך ממשקי צ'אט וקול.
+עוזר רוקח AI מבוסס בינה מלאכותית לרשת בתי מרקחת. המערכת מספקת מידע עובדתי על תרופות דרך ממשק מאוחד הכולל אפשרויות צ'אט וקול.
 
 ## 📋 תוכן עניינים
 
@@ -10,15 +10,11 @@
 - [התקנה](#התקנה)
 - [הרצה](#הרצה)
 - [שימוש](#שימוש)
-- [תיעוד](#תיעוד)
-- [בדיקות](#בדיקות)
 
 ## 🎯 סקירה כללית
 
-עוזר רוקח AI הוא אפליקציית ווב המספקת מידע עובדתי על תרופות דרך שלושה ערוצים:
-- **ממשק מאוחד (Unified)**: ממשק גמיש - כתוב או דבר, קבל תשובות בטקסט ובקול תמיד ✨ **מומלץ!**
-- **צ'אט (Chat)**: ממשק טקסט בלבד עם OpenAI API
-- **קולי (Voice)**: ממשק קולי בלבד עם OpenAI Realtime API
+עוזר רוקח AI הוא אפליקציית ווב המספקת מידע עובדתי על תרופות דרך ממשק מאוחד:
+- **ממשק מאוחד (Unified)**: ממשק גמיש - כתוב או דבר, קבל תשובות בטקסט ובקול תמיד ✨
 
 ### מה המערכת יכולה לעשות ✅
 
@@ -38,7 +34,7 @@
 
 ## 🚀 תכונות
 
-### ממשק מאוחד (מומלץ!) ⭐
+### ממשק מאוחד ⭐
 - **קלט גמיש**: כתוב או דבר - בחר מה שנוח לך
 - **פלט כפול**: תשובות מוצגות תמיד בטקסט ונשמעות בקול
 - **הצגת פונקציות**: כל קריאות הפונקציות מוצגות inline עם Input/Output מפורט
@@ -46,18 +42,6 @@
 - **שליטה באודיו**: כפתור להשתקה/הפעלה של הקראת הקול
 - **זיהוי דיבור**: שימוש ב-Web Speech API לזיהוי דיבור בעברית
 - **סינתזת דיבור**: הקראת תשובות בקול בעברית באמצעות Web Speech Synthesis
-
-### ערוץ צ'אט (טקסט בלבד)
-- תשובות מפורטות ומובנות
-- מצב מפתח (Developer Mode) להצגת קריאות כלים
-- היסטוריית שיחה
-- תמיכה מלאה ב-RTL ועברית
-
-### ערוץ קולי (WebRTC בלבד)
-- שיחה טבעית עם AI
-- תמלול בזמן אמת
-- תשובות תמציתיות ושיחתיות
-- תמיכה בעברית
 
 ### כלים (Tools/Functions)
 
@@ -70,32 +54,79 @@
 
 ```
 pharmacy-assistant/
-├── backend/                    # Python backend
-│   ├── chat_server.py         # Flask server לצ'אט
-│   ├── openai_client.py       # לקוח OpenAI API
-│   └── mock_pharmacy_api.py   # Mock API של בית המרקחת
-├── frontend/                   # Frontend
-│   ├── index.html             # דף נחיתה
-│   ├── unified.html           # ממשק מאוחד (מומלץ!)
-│   ├── chat.html              # ממשק צ'אט (טקסט בלבד)
-│   ├── voice.html             # ממשק קולי (WebRTC בלבד)
-│   ├── css/
-│   │   └── styles.css         # עיצוב
-│   └── js/
-│       ├── mock-api.js        # Mock API (JavaScript)
-│       ├── unified-client.js  # לקוח מאוחד (טקסט + קול)
-│       ├── chat-client.js     # לקוח צ'אט
-│       └── voice-client.js    # לקוח קולי
-├── prompts/                    # הגדרות AI
-│   ├── system-prompt.txt      # System prompt
-│   └── function-definitions.json  # הגדרות כלים
-├── flows/                      # תיעוד תרחישים
-│   ├── flow1-medication-info.md
-│   ├── flow2-stock-check.md
-│   └── flow3-ingredient-search.md
-├── testing/                    # בדיקות
-│   └── test-plan.md           # תוכנית בדיקות
-└── requirements.txt            # תלויות Python
+├── src/
+│   ├── backend/                      # Python Backend
+│   │   ├── api/                      # API Layer
+│   │   │   ├── __init__.py
+│   │   │   └── server.py             # Flask server (main entry point)
+│   │   ├── services/                 # Business Logic
+│   │   │   ├── __init__.py
+│   │   │   ├── openai_service.py     # OpenAI API integration
+│   │   │   └── pharmacy_service.py   # Pharmacy database & tools
+│   │   ├── config/                   # Configuration
+│   │   │   ├── __init__.py
+│   │   │   └── prompts/              # AI prompts & function definitions
+│   │   │       ├── system-prompt.txt
+│   │   │       └── function-definitions.json
+│   │   └── __init__.py
+│   └── frontend/                     # Frontend
+│       ├── public/                   # HTML pages
+│       │   ├── index.html            # Landing page
+│       │   └── unified.html          # Main unified interface
+│       └── assets/                   # Static assets
+│           ├── js/                   # JavaScript files
+│           │   ├── unified-client.js # Client logic for unified interface
+│           │   └── mock-api.js       # Frontend medication database
+│           └── css/                  # Stylesheets
+│               └── styles.css        # Main styles (RTL-aware)
+├── run.py                            # Application launcher script
+├── requirements.txt                  # Python dependencies
+├── .env                              # Environment variables (git-ignored)
+├── .env.example                      # Environment variables template
+├── .gitignore                        # Git ignore rules
+└── README.md                         # This file
+```
+
+### ארכיטקטורת Backend
+
+```
+┌─────────────────────────────┐
+│      API Layer (api/)       │
+│  - server.py (Flask routes) │
+│  - Handles HTTP requests    │
+└──────────┬──────────────────┘
+           │
+           ▼
+┌─────────────────────────────┐
+│  Services Layer (services/) │
+│  - openai_service.py        │
+│  - pharmacy_service.py      │
+│  - Business logic           │
+└──────────┬──────────────────┘
+           │
+           ▼
+┌─────────────────────────────┐
+│   Config Layer (config/)    │
+│  - System prompts           │
+│  - Function definitions     │
+└─────────────────────────────┘
+```
+
+### ארכיטקטורת Frontend
+
+```
+┌─────────────────────────────┐
+│    Public Pages (public/)   │
+│  - index.html (landing)     │
+│  - unified.html (main app)  │
+└──────────┬──────────────────┘
+           │
+           ▼
+┌─────────────────────────────┐
+│    Assets (assets/)         │
+│  - JavaScript (js/)         │
+│  - Stylesheets (css/)       │
+└─────────────────────────────┘
 ```
 
 ## 📦 התקנה
@@ -103,181 +134,185 @@ pharmacy-assistant/
 ### דרישות מקדימות
 
 - Python 3.8+
-- pip
-- מפתח API של OpenAI
+- OpenAI API Key
+- דפדפן מודרני (Chrome, Firefox, Safari, Edge) עם תמיכה ב-Web Speech API
 
 ### שלבי התקנה
 
-1. **שכפול הפרויקט**
+1. **Clone הפרויקט:**
 ```bash
+git clone <repository-url>
 cd pharmacy-assistant
 ```
 
-2. **התקנת תלויות Python**
+2. **צור סביבה וירטואלית:**
+```bash
+python3 -m venv .venv
+source .venv/bin/activate  # Linux/Mac
+# או
+.venv\Scripts\activate  # Windows
+```
+
+3. **התקן תלויות:**
 ```bash
 pip install -r requirements.txt
 ```
 
-3. **הגדרת מפתח API**
+4. **הגדר משתני סביבה:**
 ```bash
-export OPENAI_API_KEY='your-api-key-here'
+cp .env.example .env
+```
+ערוך את הקובץ `.env` והכנס את ה-API key שלך:
+```
+OPENAI_API_KEY=sk-your-api-key-here
 ```
 
-או צור קובץ `.env`:
-```
-OPENAI_API_KEY=your-api-key-here
-```
+## 🚀 הרצה
 
-## 🎮 הרצה
+### התחלה מהירה
 
-### הפעלת השרת
+פשוט הרץ את סקריפט ההפעלה:
 
 ```bash
-cd backend
-python chat_server.py
+python3 run.py
 ```
 
-השרת יעלה על `http://localhost:5001`
+השרת יעלה ויהיה זמין בכתובות הבאות:
+- **דף הבית**: http://localhost:8080/
+- **ממשק מאוחד**: http://localhost:8080/unified.html
+- **Health Check**: http://localhost:8080/health
 
-### פתיחת הממשק
+### הרצה ידנית (אופציונלי)
 
-לאחר הפעלת השרת, פתח דפדפן וגש לכתובת:
+אם אתה רוצה להריץ את השרת ידנית:
 
+```bash
+cd src/backend
+python3 -m api.server
 ```
-http://localhost:8080/index.html
-```
 
-**שים לב:** השרת מגיש את קבצי הממשק מתיקיית `frontend/` ישירות על פורט 8080.
+### עצירת השרת
+
+לחץ `Ctrl+C` בטרמינל כדי לעצור את השרת.
 
 ## 💡 שימוש
 
-### ממשק מאוחד (מומלץ!) ⭐
+### ממשק מאוחד (Unified Interface)
 
-1. פתח את `unified.html` (או בחר "ממשק מאוחד" מדף הבית)
-2. **אופציה 1 - כתיבה**: הקלד שאלה בשדה הטקסט ולחץ "שלח"
-3. **אופציה 2 - דיבור**: לחץ על כפתור המיקרופון 🎤 ודבר
-4. קבל תשובה **בטקסט** (בחלון הצ'אט) ו**בקול** (נשמע אוטומטית)
-5. ראה את כל קריאות הפונקציות עם Input/Output מפורט
+1. פתח את הדפדפן בכתובת: http://localhost:8080/unified.html
+2. בחר את אופן התקשורת:
+   - **כתיבה**: הקלד שאלה בשדה הטקסט ולחץ "שלח"
+   - **דיבור**: לחץ על כפתור המיקרופון 🎤 ודבר בעברית
+3. התגובה תוצג בטקסט ותושמע בקול
+4. כפתורי שליטה:
+   - 🔧 **מצב מפתח**: הצגת פרטים טכניים
+   - 🔊/🔇 **אודיו**: השתקה/הפעלה של הקראת קול
+   - 🗑️ **ניקוי**: מחיקת השיחה והתחלה מחדש
 
-**תכונות:**
-- 🔊/🔇 - השתק/הפעל הקראת קול
-- 🔧 - מצב מפתח לפרטים טכניים
-- 🗑️ - נקה שיחה
+### דוגמאות לשאלות
 
-**דוגמאות לשאלות:**
-- "יש לכם נורופן במלאי?"
-- "מה המרכיב הפעיל באקמול?"
-- "אילו תרופות יש עם איבופרופן?"
+#### מידע על תרופה
+```
+"מה זה נורופן?"
+"ספר לי על אקמול"
+```
 
-### ממשק צ'אט (טקסט בלבד)
+#### בדיקת מלאי
+```
+"יש לכם נורופן במלאי?"
+"נורופן 400 זמין?"
+```
 
-1. פתח את `chat.html`
-2. הקלד שאלה על תרופה
-3. לחץ "שלח" או Enter
-4. קבל תשובה מפורטת (טקסט בלבד)
+#### חיפוש לפי מרכיב
+```
+"אילו תרופות יש עם איבופרופן?"
+"מה יש עם פרצטמול?"
+```
 
-### ממשק קולי (WebRTC בלבד)
+#### דרישת מרשם
+```
+"האם ונטולין דורש מרשם?"
+"נורופן צריך מרשם?"
+```
 
-1. פתח את `voice.html`
-2. לחץ "התחל שיחה"
-3. דבר בבירור
-4. קבל תשובה קולית (עם תמלול)
+#### חיפוש תחליפים
+```
+"מה התחליף לאופטלגין?"
+"יש תחליף לנורופן?"
+```
 
-**טיפים:**
-- דבר בבירור ובקצב נורמלי
-- שאל שאלות ספציפיות
-- המתן לתשובה לפני שאלה נוספת
+## 🔧 API Endpoints
 
-### מצב מפתח (Developer Mode)
+### POST /chat
+שליחת הודעות צ'אט ל-AI
 
-לחץ על 🔧 בכל ממשק כדי לראות:
-- קריאות כלים (TOOL CALL)
-- תשובות כלים (TOOL RESPONSE)
-- JSON מפורט
+**Request Body:**
+```json
+{
+  "messages": [
+    {"role": "user", "content": "יש לכם נורופן?"}
+  ]
+}
+```
 
-## 📚 תיעוד
+**Response:**
+```json
+{
+  "success": true,
+  "message": "כן, נורופן זמין במלאי שלנו...",
+  "tool_calls": [
+    {
+      "name": "get_medication_by_name",
+      "arguments": {"name": "נורופן"},
+      "result": {...}
+    }
+  ]
+}
+```
 
-### System Prompt
+### GET /health
+בדיקת תקינות השרת
 
-ה-System Prompt מגדיר את התנהגות ה-AI:
-- תפקיד: עוזר רוקח
-- מגבלות: ללא ייעוץ רפואי
-- פרוטוקול שימוש בכלים
-- התאמה לערוץ (Voice/Chat)
+**Response:**
+```json
+{
+  "status": "ok"
+}
+```
 
-ראה: [`prompts/system-prompt.txt`](prompts/system-prompt.txt)
+### GET /api
+מידע על ה-API
 
-### הגדרות כלים
+**Response:**
+```json
+{
+  "name": "Pharmacy Assistant Chat API",
+  "version": "1.0.0",
+  "status": "running",
+  "endpoints": {...}
+}
+```
 
-כל כלי מוגדר עם:
-- שם ותיאור
-- פרמטרים נדרשים ואופציונליים
-- סכמת JSON
+## 🧪 פיתוח
 
-ראה: [`prompts/function-definitions.json`](prompts/function-definitions.json)
+### מבנה קוד מומלץ
 
-### תרחישי שימוש (Flows)
+- **Backend Services**: כל לוגיקה עסקית ב-`src/backend/services/`
+- **API Routes**: נתיבי HTTP ב-`src/backend/api/`
+- **Config**: הגדרות ופרומפטים ב-`src/backend/config/`
+- **Frontend**: HTML, CSS, JS ב-`src/frontend/`
 
-תיעוד מפורט של 3 תרחישים עיקריים:
+### הוספת תרופה חדשה
 
-1. **Flow 1**: שאלות מידע על תרופות
-   - [`flows/flow1-medication-info.md`](flows/flow1-medication-info.md)
-
-2. **Flow 2**: בדיקת מלאי והצעת תחליפים
-   - [`flows/flow2-stock-check.md`](flows/flow2-stock-check.md)
-
-3. **Flow 3**: חיפוש לפי מרכיב פעיל
-   - [`flows/flow3-ingredient-search.md`](flows/flow3-ingredient-search.md)
-
-## 🧪 בדיקות
-
-### הרצת בדיקות Mock API
-
-פתח את `test-mock-api.html` בדפדפן לבדיקת ה-Mock API.
-
-### תוכנית בדיקות מקיפה
-
-ראה [`testing/test-plan.md`](testing/test-plan.md) לתוכנית בדיקות מלאה עם:
-- 40+ מקרי בדיקה
-- בדיקות חיוביות ושליליות
-- בדיקות Voice vs Chat
-- בדיקות אבטחה ומדיניות
-
-### מקרי בדיקה קריטיים
-
-**חובה לעבור:**
-- ✅ הפניה נכונה לייעוץ רפואי
-- ✅ זיהוי תרופות
-- ✅ הצעת תחליפים
-- ✅ הבדל Voice/Chat
-
-## 🔒 אבטחה ומדיניות
-
-### עקרונות בטיחות
-
-1. **אין ייעוץ רפואי** - המערכת מפנה תמיד לרופא/רוקח
-2. **מידע עובדתי בלבד** - רק עובדות על תרופות
-3. **שקיפות** - אם לא יודע, אומר זאת
-4. **פרטיות** - לא מבקש מידע רפואי אישי
-
-### דוגמאות להפניה
-
-**שאלה:** "כואב לי הראש, מה לקחת?"
-**תשובה:** "אני מצטער, אבל אני לא יכול להמליץ על תרופה ספציפית. זה דורש ייעוץ רפואי..."
-
-## 🛠️ פיתוח
-
-### הוספת תרופות חדשות
-
-ערוך את `backend/mock_pharmacy_api.py`:
+ערוך את `src/backend/services/pharmacy_service.py` והוסף אובייקט ל-`MEDICATIONS_DB`:
 
 ```python
 {
-    "name_he": "שם התרופה",
-    "name_en": "Medication Name",
+    "name_he": "שם התרופה בעברית",
+    "name_en": "English Name",
     "active_ingredient": "מרכיב פעיל",
     "strength_mg": [100, 200],
-    "instructions_dosage": "הוראות...",
+    "instructions_dosage": "הוראות שימוש...",
     "in_stock": True,
     "requires_prescription": False,
     "category": "קטגוריה",
@@ -285,48 +320,25 @@ http://localhost:8080/index.html
 }
 ```
 
-### שינוי System Prompt
+### שינוי התנהגות AI
 
-ערוך את `prompts/system-prompt.txt` לשינוי התנהגות ה-AI.
+ערוך את `src/backend/config/prompts/system-prompt.txt` לשינוי ההתנהגות והטון של ה-AI.
 
-### הוספת כלי חדש
+## 📝 רישיון
 
-1. הוסף פונקציה ב-`backend/mock_pharmacy_api.py`
-2. הוסף הגדרה ב-`prompts/function-definitions.json`
-3. עדכן את `execute_function()` ב-`mock_pharmacy_api.py`
+פרויקט זה הוא לצרכי הדגמה בלבד. אין להשתמש בו לצורך ייעוץ רפואי אמיתי ללא אישור מקצועי.
 
-## 📝 הערות חשובות
+## ⚠️ אזהרות חשובות
 
-### Mock API
+- המערכת מספקת **מידע עובדתי בלבד** ואינה מחליפה ייעוץ רפואי מקצועי
+- לייעוץ רפואי פנה תמיד לרוקח או רופא מוסמך
+- מאגר התרופות הוא mock (הדגמה) ואינו מייצג מלאי אמיתי
+- אין להשתמש במערכת זו לקבלת החלטות רפואיות
 
-המערכת משתמשת ב-Mock API לצורכי הדגמה. בסביבת ייצור, יש להחליף ב-API אמיתי של בית המרקחת.
+## 🙋 תמיכה
 
-### OpenAI Realtime API
-
-ממשק הקול דורש:
-- מפתח API של OpenAI
-- ספריית `@openai/agents` (JavaScript)
-- תמיכה בדפדפן למיקרופון
-
-### עברית ו-RTL
-
-המערכת תומכת מלאה בעברית:
-- כל הטקסטים בעברית
-- כיוון RTL
-- פונטים תומכי עברית
-
-## 🤝 תרומה
-
-זהו פרויקט הדגמה למשרת Agent Engineering Team Lead.
-
-## 📄 רישיון
-
-פרויקט הדגמה - כל הזכויות שמורות.
-
-## 📞 יצירת קשר
-
-לשאלות או הערות, אנא פנה למפתח הפרויקט.
+לשאלות או בעיות, פתח Issue בריפוזיטורי או צור קשר עם מפתח הפרויקט.
 
 ---
 
-**זכור:** מערכת זו מספקת מידע עובדתי בלבד ואינה מחליפה ייעוץ רפואי מקצועי.
+**Built with ❤️ using Flask, OpenAI API, and Web Speech API**

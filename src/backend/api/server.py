@@ -3,14 +3,24 @@ Simple Flask server for pharmacy assistant chat
 """
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
-from openai_client import chat_completion, get_client
-from dotenv import load_dotenv
+import sys
 import os
+from pathlib import Path
+
+# Add parent directory to path for imports
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+from services.openai_service import chat_completion, get_client
+from dotenv import load_dotenv
 
 load_dotenv()
 
+# Get the absolute path to the project root
+project_root = Path(__file__).parent.parent.parent.parent
+frontend_path = project_root / 'src' / 'frontend'
+
 # Set the static folder to the frontend directory
-app = Flask(__name__, static_folder='../frontend', static_url_path='')
+app = Flask(__name__, static_folder=str(frontend_path / 'public'), static_url_path='')
 CORS(app)
 
 
@@ -69,9 +79,16 @@ def serve_index():
     return send_from_directory(app.static_folder, 'index.html')
 
 
+@app.route('/assets/<path:path>')
+def serve_assets(path):
+    """Serve static assets (JS, CSS, etc.)"""
+    assets_folder = frontend_path / 'assets'
+    return send_from_directory(str(assets_folder), path)
+
+
 @app.route('/<path:path>')
 def serve_static(path):
-    """Serve static files from frontend directory"""
+    """Serve static files from frontend public directory"""
     return send_from_directory(app.static_folder, path)
 
 

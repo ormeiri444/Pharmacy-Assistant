@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>צ'אט - עוזר רוקח AI</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <title>עוזר בית מרקחת AI</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
     <div class="container chat-container">
         <header class="chat-header">
             <button class="btn-back" onclick="location.href='index.html'">← חזרה</button>
-            <h1>💬 צ'אט עם עוזר רוקח</h1>
+            <h1>עוזר בית מרקחת AI</h1>
             <div class="header-actions">
                 <button class="btn-icon" id="toggleDeveloperMode" title="מצב מפתח">🔧</button>
+                <button class="btn-icon" id="toggleAudio" title="השתק/הפעל אודיו" style="background: #28a745;">🔊</button>
                 <button class="btn-icon" id="clearChat" title="נקה שיחה">🗑️</button>
             </div>
         </header>
@@ -28,6 +29,7 @@
                         <li>דרישות מרשם</li>
                     </ul>
                     <p><strong>שים לב:</strong> אני מספק מידע עובדתי בלבד ולא ייעוץ רפואי.</p>
+                    <p><strong>💡 טיפ:</strong> אתה יכול לכתוב או לדבר איתי - התגובות תמיד יוצגו בכתב ויושמעו בקול!</p>
                 </div>
             </div>
         </div>
@@ -37,26 +39,26 @@
                 <span></span><span></span><span></span>
             </div>
             <form class="chat-input-form" id="chatForm">
-                <input 
-                    type="text" 
-                    id="messageInput" 
-                    placeholder="שאל שאלה על תרופה..."
+                <button type="button" class="btn-voice-toggle" id="voiceInputBtn" title="לחץ לדיבור (או להפסקת תשובה מוקראת)">
+                    <span id="voiceIcon">🎤</span>
+                </button>
+                <input
+                    type="text"
+                    id="messageInput"
+                    placeholder="כתוב או לחץ על המיקרופון לדיבור (🎤 גם עוצר תשובה מוקראת)..."
                     autocomplete="off"
-                    required
                 >
                 <button type="submit" class="btn-send" id="sendButton">
                     <span>שלח</span>
                 </button>
             </form>
-        </div>
-
-        <div class="developer-mode" id="developerMode" style="display: none;">
-            <h3>🔧 מצב מפתח</h3>
-            <div id="developerContent"></div>
+            <div class="voice-status" id="voiceStatus" style="display: none; padding: 8px; text-align: center; font-size: 12px; color: #666;">
+                <span id="voiceStatusText">מקשיב...</span>
+            </div>
         </div>
     </div>
 
-    <script src="js/mock-api.js?v=2"></script>
-    <script src="js/chat-client.js?v=2"></script>
+    <script src="assets/js/mock-api.js?v=4"></script>
+    <script src="assets/js/unified-client.js?v=4"></script>
 </body>
 </html>
