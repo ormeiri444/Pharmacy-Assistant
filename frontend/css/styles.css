@@ -492,3 +492,38 @@ footer {
         max-width: 90%;
     }
 }
+
+/* Unified Interface - Voice Toggle Button */
+.btn-voice-toggle {
+    padding: 12px;
+    background: transparent;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s;
+    min-width: 48px;
+}
+
+.btn-voice-toggle:hover {
+    background: #f0f0f0;
+    border-color: var(--primary-color);
+}
+
+.btn-voice-toggle:active {
+    transform: scale(0.95);
+}
+
+/* Voice status indicator */
+.voice-status {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
