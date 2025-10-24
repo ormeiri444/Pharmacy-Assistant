@@ -26,8 +26,6 @@ const voiceInputBtn = document.getElementById('voiceInputBtn');
 const voiceIcon = document.getElementById('voiceIcon');
 const voiceStatus = document.getElementById('voiceStatus');
 const voiceStatusText = document.getElementById('voiceStatusText');
-const developerMode = document.getElementById('developerMode');
-const developerContent = document.getElementById('developerContent');
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
@@ -245,8 +243,8 @@ async function handleSubmit(e) {
         const data = await response.json();
 
         if (data.success) {
-            // Show tool calls in chat (inline - always visible)
-            if (data.tool_calls && data.tool_calls.length > 0) {
+            // Show tool calls ONLY in developer mode (inline in chat)
+            if (data.tool_calls && data.tool_calls.length > 0 && developerModeEnabled) {
                 data.tool_calls.forEach(toolCall => {
                     showToolCallInChat(toolCall);
                 });
@@ -263,13 +261,6 @@ async function handleSubmit(e) {
                 role: 'assistant',
                 content: data.message
             });
-
-            // Show tool calls in developer mode (detailed view)
-            if (data.tool_calls && developerModeEnabled) {
-                data.tool_calls.forEach(toolCall => {
-                    showToolCallInDeveloperMode(toolCall);
-                });
-            }
         } else {
             const errorMsg = 'מצטער, אירעה שגיאה. אנא נסה שוב.';
             addMessage(errorMsg, 'bot');
@@ -349,10 +340,6 @@ function clearChat() {
         // Add welcome message
         const welcomeMsg = 'שלום! אני עוזר רוקח AI. במה אוכל לעזור לך?';
         addMessage(welcomeMsg, 'bot');
-
-        if (developerModeEnabled) {
-            developerContent.innerHTML = '';
-        }
     }
 }
 
@@ -361,45 +348,14 @@ function clearChat() {
  */
 function toggleDeveloperMode() {
     developerModeEnabled = !developerModeEnabled;
-    developerMode.style.display = developerModeEnabled ? 'block' : 'none';
     toggleDevModeBtn.style.background = developerModeEnabled ? '#ffc107' : 'transparent';
+
+    // Update button title
+    toggleDevModeBtn.title = developerModeEnabled ? 'מצב מפתח פעיל - קריאות פונקציה מוצגות' : 'מצב מפתח כבוי';
 }
 
 /**
- * Show tool call in developer mode (detailed view)
- */
-function showToolCallInDeveloperMode(toolCall) {
-    const callDiv = document.createElement('div');
-    callDiv.style.marginBottom = '20px';
-    callDiv.style.padding = '15px';
-    callDiv.style.backgroundColor = '#1e1e1e';
-    callDiv.style.borderRadius = '8px';
-    callDiv.style.border = '1px solid #50fa7b';
-
-    const callInfo = `
-        <div style="margin-bottom: 10px;">
-            <strong style="color: #50fa7b; font-size: 14px;">🔧 TOOL CALL:</strong>
-            <span style="color: #8be9fd; font-weight: bold;">${toolCall.name}</span>
-        </div>
-        <div style="margin-bottom: 10px;">
-            <strong style="color: #f1fa8c;">Parameters:</strong>
-            <pre style="background: #282a36; padding: 10px; border-radius: 4px; margin-top: 5px; overflow-x: auto;">${JSON.stringify(toolCall.arguments, null, 2)}</pre>
-        </div>
-        <div>
-            <strong style="color: #50fa7b;">✅ TOOL RESPONSE:</strong>
-            <pre style="background: #282a36; padding: 10px; border-radius: 4px; margin-top: 5px; overflow-x: auto;">${JSON.stringify(toolCall.result, null, 2)}</pre>
-        </div>
-    `;
-
-    callDiv.innerHTML = callInfo;
-    developerContent.appendChild(callDiv);
-
-    // Scroll developer content to bottom
-    developerContent.scrollTop = developerContent.scrollHeight;
-}
-
-/**
- * Show tool call in main chat area (always visible - inline display)
+ * Show tool call in main chat area (only when developer mode is ON)
  */
 function showToolCallInChat(toolCall) {
     const callDiv = document.createElement('div');
