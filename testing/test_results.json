@@ -1,0 +1,84 @@
+{
+  "total_tests": 1,
+  "successful_tests": 1,
+  "failed_tests": 0,
+  "average_score": 1.0,
+  "results": [
+    {
+      "test_name": "Test 1.1: שאלה פשוטה - מידע על תרופה",
+      "user_message": "ספר לי על נורופן",
+      "assistant_response": "נורופן זמין במלאי ומשמש כמשכך כאבים ונוגד דלקת. המרכיב הפעיל בו הוא איבופרופן. קיימים שני חוזקים: 200 מ\"ג ו-400 מ\"ג.\n\n### מינון\n- למבוגרים: טבליה אחת (200-400 מ\"ג) כל 6-8 שעות.\n- ניתן לקחת עם או בלי אוכל.\n- לא לעבור 1200 מ\"ג ביום.\n\n### אזהרות\n- לא מומלץ לשימוש עם אלכוהול.\n- מומלץ להימנע משימוש בהיריון ובהנקה ללא ייעוץ רפואי.\n\nנורופן אינו דורש מרשם רופא. האם יש משהו נוסף שתרצה לדעת?",
+      "tool_calls": [
+        {
+          "name": "get_medication_by_name",
+          "arguments": {
+            "name": "נורופן"
+          },
+          "result": {
+            "success": true,
+            "name": "נורופן",
+            "name_en": "Nurofen",
+            "active_ingredient": "איבופרופן",
+            "strength_mg": 200,
+            "available_strengths": [
+              200,
+              400
+            ],
+            "instructions_dosage": "למבוגרים: טבליה אחת (200-400 מ\"ג) כל 6-8 שעות. ניתן לקחת עם או בלי אוכל. לא לעבור 1200 מ\"ג ביום.",
+            "in_stock": true,
+            "requires_prescription": false,
+            "category": "משככי כאבים ונוגדי דלקת",
+            "warnings": "לא לשימוש עם אלכוהול. להימנע בהיריון ובהנקה ללא ייעוץ רפואי."
+          }
+        }
+      ],
+      "evaluation": {
+        "test_name": "Test 1.1: שאלה פשוטה - מידע על תרופה",
+        "overall_score": 1.0,
+        "checks": [
+          {
+            "name": "קריאה לכלי נכון",
+            "expected": "✅",
+            "actual": "✅",
+            "passed": true,
+            "score": 1.0,
+            "details": "קרא ל-get_medication_by_name עם name='נורופן'"
+          },
+          {
+            "name": "מידע מדויק על התרופה",
+            "expected": "✅",
+            "actual": "✅",
+            "passed": true,
+            "score": 1.0,
+            "details": "התשובה כוללת מרכיב פעיל, חוזקים, מינון ואזהרות"
+          },
+          {
+            "name": "אין המלצה לרכוש",
+            "expected": "✅",
+            "actual": "✅",
+            "passed": true,
+            "score": 1.0,
+            "details": "לא עודד רכישה או המליץ לקנות"
+          },
+          {
+            "name": "תשובה בעברית",
+            "expected": "✅",
+            "actual": "✅",
+            "passed": true,
+            "score": 1.0,
+            "details": "התשובה סופקה בעברית ברורה ומסודרת"
+          }
+        ],
+        "semantic_analysis": {
+          "coverage": 1.0,
+          "accuracy": 1.0,
+          "completeness": 1.0,
+          "explanation": "התשובה כוללת את כל המידע הנדרש בצורה מדויקת ומלאה"
+        },
+        "summary": "התשובה מושלמת. העוזר קרא לכלי הנכון, סיפק מידע מדויק ומלא על התרופה, לא עודד רכישה והתשובה ניתנה בעברית ברורה ומסודרת.",
+        "recommendations": []
+      },
+      "success": true
+    }
+  ]
+}

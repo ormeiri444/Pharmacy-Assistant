@@ -1,14 +1,17 @@
 /* Pharmacy Assistant - Styles */
 
 :root {
-    --primary-color: #0066cc;
-    --secondary-color: #28a745;
+    --primary-color: #009933;
+    --secondary-color: #00b33c;
+    --accent-color: #0066cc;
     --danger-color: #dc3545;
-    --bg-color: #f5f7fa;
+    --bg-color: #f8faf9;
     --card-bg: #ffffff;
-    --text-color: #333333;
-    --border-color: #e0e0e0;
-    --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    --text-color: #2c3e50;
+    --text-light: #6c757d;
+    --border-color: #e0e6e3;
+    --shadow: 0 2px 12px rgba(0, 153, 51, 0.08);
+    --header-bg: #ffffff;
 }
 
 * {
@@ -31,10 +34,85 @@ body {
     padding: 20px;
 }
 
+/* Professional Header */
+.top-header {
+    background: var(--header-bg);
+    border-bottom: 3px solid var(--primary-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    padding: 15px 0;
+    margin-bottom: 0;
+}
+
+.top-header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.pharmacy-logo {
+    height: 50px;
+    width: auto;
+}
+
+.brand-info h1 {
+    color: var(--primary-color);
+    font-size: 1.8rem;
+    margin: 0;
+    font-weight: 700;
+}
+
+.brand-tagline {
+    color: var(--text-light);
+    font-size: 0.85rem;
+    margin-top: 2px;
+}
+
+.header-contact {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-left;
+    gap: 5px;
+}
+
+.contact-item {
+    color: var(--text-color);
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.contact-icon {
+    color: var(--primary-color);
+    font-size: 1rem;
+}
+
+.emergency-badge {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(0, 153, 51, 0.2);
+}
+
 /* Header */
 header {
     text-align: center;
     margin-bottom: 40px;
+    margin-top: 30px;
 }
 
 header h1 {
@@ -44,7 +122,7 @@ header h1 {
 }
 
 .subtitle {
-    color: #666;
+    color: var(--text-light);
     font-size: 1.1rem;
 }
 
@@ -470,26 +548,132 @@ footer {
     text-align: center;
 }
 
+.professional-footer {
+    background: linear-gradient(to bottom, #ffffff 0%, #f0f5f3 100%);
+    border-top: 3px solid var(--primary-color);
+    padding: 40px 20px 20px;
+    margin-top: 60px;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    text-align: right;
+    margin-bottom: 30px;
+}
+
+.footer-section h3 {
+    color: var(--primary-color);
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    font-weight: 700;
+}
+
+.footer-section p,
+.footer-section ul {
+    color: var(--text-color);
+    font-size: 0.9rem;
+    line-height: 1.8;
+    margin: 8px 0;
+}
+
+.footer-section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-section ul li {
+    padding: 6px 0;
+}
+
+.footer-section ul li::before {
+    content: "• ";
+    color: var(--primary-color);
+    font-weight: bold;
+    margin-left: 8px;
+}
+
+.branch-item {
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.branch-item:last-child {
+    border-bottom: none;
+}
+
+.branch-name {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.footer-bottom {
+    border-top: 1px solid var(--border-color);
+    padding-top: 20px;
+    text-align: center;
+    color: var(--text-light);
+    font-size: 0.85rem;
+}
+
+.footer-badges {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+}
+
+.badge {
+    background: white;
+    border: 2px solid var(--primary-color);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .container {
         padding: 10px;
     }
-    
+
+    .top-header-content {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .logo-section {
+        flex-direction: column;
+    }
+
+    .header-contact {
+        align-items: center;
+    }
+
     header h1 {
         font-size: 2rem;
     }
-    
+
     .mode-selection {
         grid-template-columns: 1fr;
     }
-    
+
     .chat-container {
         height: 100vh;
     }
-    
+
     .message-content {
         max-width: 90%;
+    }
+
+    .footer-content {
+        grid-template-columns: 1fr;
     }
 }
 
