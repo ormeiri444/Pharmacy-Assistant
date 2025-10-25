@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>עוזר רוקח AI - מרפאה פלוס (Realtime)</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+    <!-- Professional Header -->
+    <div class="top-header">
+        <div class="top-header-content">
+            <div class="logo-section">
+                <img src="../assets/images/phram_logo.jpg" alt="מרפאה פלוס" class="pharmacy-logo">
+                <div class="brand-info">
+                    <h1>מרפאה פלוס</h1>
+                    <p class="brand-tagline">עוזר רוקח AI חכם (Realtime)</p>
+                </div>
+            </div>
+            <div class="header-contact">
+                <div class="contact-item">
+                    <span class="contact-icon">📞</span>
+                    <span>מוקד: 1-800-MARPE-PLUS</span>
+                </div>
+                <div class="contact-item">
+                    <span class="contact-icon">⚕️</span>
+                    <span>חירום: 03-9999999 (24/7)</span>
+                </div>
+            </div>
+            <button class="btn-back" onclick="location.href='index.html'" style="padding: 10px 20px; background: var(--primary-color); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">← חזרה לדף הבית</button>
+        </div>
+    </div>
+
+    <div class="container chat-container">
+        <header class="chat-header">
+            <h1 style="color: var(--primary-color);">💬 שיחה עם העוזר (Realtime API)</h1>
+            <div class="header-actions">
+                <button class="btn-icon" id="toggleDeveloperMode" title="מצב מפתח" style="border: 2px solid var(--border-color);">⚙️</button>
+                <button class="btn-icon" id="toggleAudio" title="השתק/הפעל אודיו" style="background: var(--secondary-color); color: white; border-radius: 8px;">🔊</button>
+                <button class="btn-icon" id="clearChat" title="נקה שיחה" style="border: 2px solid var(--border-color);">🗑️</button>
+            </div>
+        </header>
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot-message">
+                <div class="message-content">
+                    <p><strong>שלום ובוקר טוב! 👋</strong></p>
+                    <p>אני העוזר הדיגיטלי של <strong>מרפאה פלוס</strong>. אני כאן כדי לעזור לך עם:</p>
+                    <ul>
+                        <li><strong>מידע מפורט על תרופות</strong> - מרכיבים, שימושים, ותופעות לוואי</li>
+                        <li><strong>בדיקת זמינות במלאי</strong> - בכל הסניפים שלנו</li>
+                        <li><strong>תחליפים ואלטרנטיבות</strong> - אפשרויות נוספות לתרופות</li>
+                        <li><strong>דרישות מרשם</strong> - האם נדרש מרשם רופא</li>
+                        <li><strong>מידע אישי</strong> - מרשמים פעילים והיסטוריית שימוש (לאחר אימות)</li>
+                    </ul>
+                    <p>💬 <strong>כיצד להשתמש:</strong> פשוט דבר איתי או כתוב שאלה בשדה למטה. הקול תמיד פעיל!</p>
+                    <p>⚡ <strong>חדש:</strong> מערכת מבוססת WebRTC לשיחה בזמן אמת עם השהיה מינימלית</p>
+                    <p>⚠️ <strong>חשוב לדעת:</strong> אני מספק מידע עובדתי בלבד ואינני מחליף ייעוץ רפואי מקצועי. לייעוץ רפואי, פנה לרוקח או רופא מוסמך.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-input-container">
+            <div class="typing-indicator" id="typingIndicator" style="display: none;">
+                <span></span><span></span><span></span>
+            </div>
+            <form class="chat-input-form" id="chatForm">
+                <button type="button" class="btn-voice-toggle" id="voiceInputBtn" title="לחץ להתחלת שיחה קולית" style="background: var(--primary-color); color: white;">
+                    <span id="voiceIcon">🎤</span>
+                </button>
+                <input
+                    type="text"
+                    id="messageInput"
+                    placeholder="הקלד שאלה או לחץ 🎤 לשיחה קולית..."
+                    autocomplete="off"
+                >
+                <button type="submit" class="btn-send" id="sendButton" style="background: var(--primary-color);">
+                    <span>➤ שלח</span>
+                </button>
+            </form>
+            <div class="voice-status" id="voiceStatus" style="display: none; padding: 12px; text-align: center; font-size: 14px; color: white; font-weight: 600; background: linear-gradient(135deg, #28a745, #20c997); border-radius: 8px; margin-top: 10px; box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);">
+                <span id="voiceStatusText" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <span class="pulse-dot" style="width: 12px; height: 12px; background: white; border-radius: 50%; animation: pulse 1.5s ease-in-out infinite;"></span>
+                    🎤 מיקרופון פעיל - דבר בחופשיות
+                </span>
+            </div>
+            <style>
+                @keyframes pulse {
+                    0%, 100% { opacity: 1; transform: scale(1); }
+                    50% { opacity: 0.5; transform: scale(1.2); }
+                }
+            </style>
+        </div>
+    </div>
+
+    <!-- Simple Footer for Chat Page -->
+    <div style="background: var(--header-bg); border-top: 2px solid var(--border-color); padding: 15px; text-align: center; margin-top: 20px;">
+        <p style="color: var(--text-light); font-size: 0.85rem; margin: 5px 0;">
+            <strong style="color: var(--primary-color);">מרפאה פלוס</strong> - רשת בתי מרקחת מובילה |
+            מוקד: <strong>1-800-MARPE-PLUS</strong> |
+            חירום 24/7: <strong>03-9999999</strong>
+        </p>
+        <p style="color: var(--text-light); font-size: 0.75rem; margin-top: 8px;">
+            &copy; 2024 כל הזכויות שמורות | רישיון משה״ב: #MOH-12345-PH
+        </p>
+    </div>
+
+    <!-- Load WebRTC and Realtime scripts -->
+    <script src="assets/js/rtc-manager.js"></script>
+    <script src="assets/js/event-handler.js"></script>
+    <script src="assets/js/unified-realtime-client.js"></script>
+</body>
+</html>

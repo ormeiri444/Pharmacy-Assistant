@@ -11,7 +11,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from services.openai_service import chat_completion, get_client
+from services.realtime_service import create_realtime_session
 from dotenv import load_dotenv
+import json
 
 load_dotenv()
 
@@ -50,6 +52,62 @@ def chat():
         }), 500
 
 
+@app.route('/session', methods=['POST'])
+def create_session():
+    """Create WebRTC session with OpenAI Realtime API"""
+    try:
+        # Get SDP offer from client
+        sdp_offer = request.data.decode('utf-8')
+
+        if not sdp_offer:
+            return jsonify({
+                "success": False,
+                "error": "No SDP offer provided"
+            }), 400
+
+        # Create session with OpenAI
+        answer_sdp = create_realtime_session(sdp_offer)
+
+        # Return SDP answer
+        return answer_sdp, 200, {'Content-Type': 'application/sdp'}
+
+    except Exception as e:
+        print(f"Error creating session: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+
+
+@app.route('/execute-tool', methods=['POST'])
+@app.route('/execute-function', methods=['POST'])
+def execute_tool():
+    """Execute a pharmacy tool function"""
+    try:
+        data = request.json
+        function_name = data.get('function_name')
+        arguments = data.get('arguments', {})
+
+        # Import pharmacy service
+        from services.pharmacy_service import execute_function
+
+        # Execute the function
+        result = execute_function(function_name, arguments)
+
+        return jsonify(result)
+
+    except Exception as e:
+        print(f"Error executing tool: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+
+
 @app.route('/realtime/token', methods=['POST'])
 def get_realtime_token():
     """Get ephemeral token for OpenAI Realtime API"""
@@ -60,11 +118,11 @@ def get_realtime_token():
         api_key = os.getenv('OPENAI_API_KEY')
         if not api_key:
             raise ValueError("OPENAI_API_KEY environment variable is not set")
-        
+
         return jsonify({
             "token": api_key
         })
-        
+
     except Exception as e:
         print(f"Error getting realtime token: {e}")
         return jsonify({
