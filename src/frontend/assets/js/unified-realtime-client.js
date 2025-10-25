@@ -137,7 +137,7 @@ async function toggleVoiceConversation() {
 /**
  * Initialize WebRTC connection
  */
-async function initializeConnection() {
+async function initializeConnection(initialMessage = null) {
     // Create RTC manager
     rtcManager = new RTCManager();
 
@@ -146,6 +146,12 @@ async function initializeConnection() {
         onSessionCreated: () => {
             console.log('[UnifiedClient] Session created successfully');
             isConnected = true;
+            
+            // Send initial message if provided
+            if (initialMessage) {
+                console.log('[UnifiedClient] Sending initial message:', initialMessage);
+                rtcManager.sendTextMessage(initialMessage);
+            }
         },
 
         onUserSpeechInterim: (transcript) => {
@@ -237,8 +243,26 @@ async function handleSubmit(e) {
         // Use WebRTC to send text message
         rtcManager.sendTextMessage(message);
     } else {
-        // Voice not connected - prompt user to start voice conversation
-        addMessage('אנא לחץ על כפתור המיקרופון 🎤 להתחלת שיחה קולית תחילה.', 'bot');
+        // Voice not connected - start connection automatically with initial message
+        try {
+            addMessage('מתחבר לשיחה...', 'bot');
+            
+            // Pass the message to be sent after connection is established
+            await initializeConnection(message);
+            
+            voiceEnabled = true;
+            
+            // Update UI to show voice is active
+            voiceIcon.textContent = '🔴';
+            voiceInputBtn.style.background = '#28a745';
+            voiceInputBtn.title = 'לחץ לעצירת שיחה קולית';
+            voiceStatus.style.display = 'block';
+            
+            addMessage('✅ מחובר! תוכל להמשיך לכתוב או לדבר', 'bot');
+        } catch (error) {
+            console.error('[UnifiedClient] Failed to auto-connect:', error);
+            addMessage('מצטער, לא הצלחתי להתחבר. אנא נסה שוב.', 'bot');
+        }
         messageInput.focus();
     }
 }
