@@ -97,24 +97,102 @@ class RTCManager {
      */
     async setupMicrophone() {
         try {
+            console.log('[RTC] Requesting microphone access...');
+            
+            // Check if getUserMedia is supported
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                throw new Error('Your browser does not support microphone access. Please use a modern browser like Chrome, Firefox, or Safari.');
+            }
+
+            // Request microphone with specific constraints
             this.localStream = await navigator.mediaDevices.getUserMedia({
                 audio: {
                     channelCount: 1,
                     sampleRate: 24000,
                     echoCancellation: true,
-                    noiseSuppression: true
+                    noiseSuppression: true,
+                    autoGainControl: true
                 }
+            });
+
+            console.log('[RTC] Microphone access granted');
+            console.log('[RTC] Audio tracks:', this.localStream.getAudioTracks().length);
+
+            // Verify we got audio tracks
+            const audioTracks = this.localStream.getAudioTracks();
+            if (audioTracks.length === 0) {
+                throw new Error('No audio tracks available from microphone');
+            }
+
+            // Log track details
+            audioTracks.forEach((track, index) => {
+                console.log(`[RTC] Audio track ${index}:`, {
+                    label: track.label,
+                    enabled: track.enabled,
+                    muted: track.muted,
+                    readyState: track.readyState,
+                    settings: track.getSettings()
+                });
             });
 
             // Add audio track to peer connection
             this.localStream.getTracks().forEach(track => {
+                console.log('[RTC] Adding track to peer connection:', track.kind);
                 this.peerConnection.addTrack(track, this.localStream);
             });
+
+            // Set up audio level monitoring
+            this.setupAudioLevelMonitoring();
 
             console.log('[RTC] Microphone setup complete');
         } catch (error) {
             console.error('[RTC] Microphone access failed:', error);
-            throw error;
+            
+            // Provide user-friendly error messages
+            if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+                throw new Error('Microphone permission denied. Please allow microphone access in your browser settings and try again.');
+            } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
+                throw new Error('No microphone found. Please connect a microphone and try again.');
+            } else if (error.name === 'NotReadableError' || error.name === 'TrackStartError') {
+                throw new Error('Microphone is already in use by another application. Please close other apps using the microphone and try again.');
+            } else {
+                throw new Error(`Microphone error: ${error.message}`);
+            }
+        }
+    }
+
+    /**
+     * Setup audio level monitoring for debugging
+     */
+    setupAudioLevelMonitoring() {
+        try {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const analyser = audioContext.createAnalyser();
+            const microphone = audioContext.createMediaStreamSource(this.localStream);
+            const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+            microphone.connect(analyser);
+            analyser.fftSize = 256;
+
+            // Monitor audio levels
+            const checkAudioLevel = () => {
+                if (!this.localStream) return;
+
+                analyser.getByteFrequencyData(dataArray);
+                const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
+                
+                // Log when audio is detected (above threshold)
+                if (average > 10) {
+                    console.log('[RTC] Audio detected - level:', Math.round(average));
+                }
+
+                requestAnimationFrame(checkAudioLevel);
+            };
+
+            checkAudioLevel();
+            console.log('[RTC] Audio level monitoring started');
+        } catch (error) {
+            console.warn('[RTC] Could not set up audio monitoring:', error);
         }
     }
 

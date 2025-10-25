@@ -24,6 +24,7 @@ class EventHandler {
      */
     handleEvent(event) {
         const eventType = event.type;
+        console.log(`[EventHandler] Processing event: ${eventType}`);
 
         switch (eventType) {
             // Session events
@@ -38,13 +39,25 @@ class EventHandler {
             case 'conversation.item.created':
                 this.handleConversationItemCreated(event);
                 break;
-
-            // Input audio transcription (user speech-to-text)
             case 'conversation.item.input_audio_transcription.delta':
                 this.handleInputAudioTranscriptionDelta(event);
                 break;
             case 'conversation.item.input_audio_transcription.completed':
                 this.handleInputAudioTranscriptionCompleted(event);
+                break;
+
+            // Input audio buffer events
+            case 'input_audio_buffer.committed':
+                console.log('[EventHandler] Audio buffer committed');
+                break;
+            case 'input_audio_buffer.speech_started':
+                console.log('[EventHandler] 🎤 Speech started detected!');
+                if (this.uiCallbacks.onUserSpeechInterim) {
+                    this.uiCallbacks.onUserSpeechInterim('...');
+                }
+                break;
+            case 'input_audio_buffer.speech_stopped':
+                console.log('[EventHandler] 🎤 Speech stopped detected');
                 break;
 
             // Response events
@@ -54,6 +67,12 @@ class EventHandler {
             case 'response.done':
                 this.handleResponseDone(event);
                 break;
+            case 'response.output_item.added':
+                console.log('[EventHandler] Output item added:', event.item?.type);
+                break;
+            case 'response.output_item.done':
+                console.log('[EventHandler] Output item done:', event.item?.type);
+                break;
 
             // Audio output transcription (AI speech-to-text)
             case 'response.audio_transcript.delta':
@@ -61,6 +80,14 @@ class EventHandler {
                 break;
             case 'response.audio_transcript.done':
                 this.handleAudioTranscriptDone(event);
+                break;
+
+            // Text deltas
+            case 'response.text.delta':
+                console.log('[EventHandler] Text delta:', event.delta);
+                break;
+            case 'response.text.done':
+                console.log('[EventHandler] Text done:', event.text);
                 break;
 
             // Function calling
@@ -74,6 +101,14 @@ class EventHandler {
             // Audio deltas (we handle this via WebRTC audio track)
             case 'response.audio.delta':
                 // Audio is handled by WebRTC audio track automatically
+                break;
+            case 'response.audio.done':
+                console.log('[EventHandler] Audio response complete');
+                break;
+
+            // Rate limits
+            case 'rate_limits.updated':
+                console.log('[EventHandler] Rate limits updated');
                 break;
 
             // Error handling

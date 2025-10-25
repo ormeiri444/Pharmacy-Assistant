@@ -41,6 +41,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     toggleAudioBtn.addEventListener('click', toggleAudio);
     voiceInputBtn.addEventListener('click', toggleVoiceConversation);
 
+    // Prevent page visibility changes from closing connection
+    document.addEventListener('visibilitychange', () => {
+        console.log('[UnifiedClient] Page visibility changed:', document.hidden);
+        // Don't cleanup on visibility change - keep connection alive
+    });
+
+    // Prevent beforeunload from triggering cleanup prematurely
+    window.addEventListener('beforeunload', (e) => {
+        if (voiceEnabled && rtcManager) {
+            console.log('[UnifiedClient] Page unloading, cleaning up...');
+            rtcManager.cleanup();
+        }
+    });
+
     // Show welcome message
     addMessage('שלום! אני עוזר רוקח AI.', 'bot');
     addMessage('לחץ על כפתור המיקרופון 🎤 להתחלת שיחה קולית, או הקלד שאלה בשדה למטה.', 'bot');
@@ -56,9 +70,18 @@ document.addEventListener('DOMContentLoaded', async () => {
  * Toggle voice conversation on/off
  */
 async function toggleVoiceConversation() {
+    console.log('[UnifiedClient] toggleVoiceConversation called, voiceEnabled:', voiceEnabled);
+    
+    // Prevent double-clicks
+    if (voiceInputBtn.disabled) {
+        console.log('[UnifiedClient] Button is disabled, ignoring click');
+        return;
+    }
+
     if (!voiceEnabled) {
         // Start voice conversation
         try {
+            console.log('[UnifiedClient] Starting voice conversation...');
             voiceInputBtn.disabled = true;
             voiceIcon.textContent = '⏳';
             voiceStatusText.textContent = 'מתחבר...';
@@ -76,6 +99,7 @@ async function toggleVoiceConversation() {
             voiceStatus.style.display = 'block';
 
             addMessage('✅ שיחה קולית מחוברת! המיקרופון מקשיב - דבר בחופשיות', 'bot');
+            console.log('[UnifiedClient] Voice conversation started, voiceEnabled:', voiceEnabled);
         } catch (error) {
             console.error('[UnifiedClient] Failed to start voice:', error);
             addMessage('מצטער, לא הצלחתי להתחבר לשיחה קולית. אנא נסה שוב.', 'bot');
@@ -87,6 +111,9 @@ async function toggleVoiceConversation() {
         }
     } else {
         // Stop voice conversation
+        console.log('[UnifiedClient] Stopping voice conversation...');
+        voiceInputBtn.disabled = true;
+        
         if (rtcManager) {
             rtcManager.cleanup();
         }
@@ -100,8 +127,10 @@ async function toggleVoiceConversation() {
         voiceInputBtn.style.background = 'var(--primary-color)';
         voiceInputBtn.title = 'לחץ להתחלת שיחה קולית';
         voiceStatus.style.display = 'none';
+        voiceInputBtn.disabled = false;
 
         addMessage('🔴 שיחה קולית הופסקה. לחץ על המיקרופון להתחלה מחדש.', 'bot');
+        console.log('[UnifiedClient] Voice conversation stopped');
     }
 }
 

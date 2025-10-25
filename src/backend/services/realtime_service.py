@@ -63,7 +63,8 @@ def create_realtime_session(sdp_offer, language='he'):
         "input_audio_format": "pcm16",
         "output_audio_format": "pcm16",
         "input_audio_transcription": {
-            "model": "whisper-1"
+            "model": "whisper-1",
+            "language": "he"  # Force Hebrew language recognition only
         },
         "turn_detection": {
             "type": "server_vad",
