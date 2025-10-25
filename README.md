@@ -1,241 +1,172 @@
-# 🏥 Pharmacy Assistant AI - עוזר רוקח AI
+# 🏥 Pharmacy Assistant AI - Realtime Voice Interface
 
-עוזר רוקח AI מבוסס בינה מלאכותית לרשת בתי מרקחת. המערכת מספקת מידע עובדתי על תרופות דרך ממשק מאוחד הכולל אפשרויות צ'אט וקול.
+Real-time voice assistant for pharmacy using OpenAI's Realtime API with WebRTC for ultra-low latency interactions.
 
-## 📋 תוכן עניינים
+## 🎯 Overview
 
-- [סקירה כללית](#סקירה-כללית)
-- [תכונות](#תכונות)
-- [ארכיטקטורה](#ארכיטקטורה)
-- [התקנה](#התקנה)
-- [הרצה](#הרצה)
-- [שימוש](#שימוש)
+This is a streamlined voice-first pharmacy assistant that uses OpenAI's Realtime API for natural, low-latency voice conversations. The system provides factual medication information through an always-listening voice interface.
 
-## 🎯 סקירה כללית
+### Key Features ⭐
 
-עוזר רוקח AI הוא אפליקציית ווב המספקת מידע עובדתי על תרופות דרך ממשק מאוחד:
-- **ממשק מאוחד (Unified)**: ממשק גמיש - כתוב או דבר, קבל תשובות בטקסט ובקול תמיד ✨
+- **⚡ Ultra-Low Latency**: 200-500ms response time via WebRTC
+- **🎤 Always Listening**: Server-side Voice Activity Detection (VAD)
+- **🗣️ Natural Speech**: Direct AI audio streaming, no robotic TTS
+- **📝 Real-time Transcription**: See what you and the AI are saying
+- **🔧 Function Calling**: All pharmacy tools work seamlessly
+- **🎨 Developer Mode**: Debug function calls and see technical details
 
-### מה המערכת יכולה לעשות ✅
+### What the System Can Do ✅
 
-- לספק מידע עובדתי על תרופות
-- להסביר הוראות מינון ושימוש
-- לאשר דרישות מרשם
-- לבדוק זמינות במלאי
-- לזהות מרכיבים פעילים
-- להציע תחליפים זמינים
+- Provide factual medication information
+- Explain dosage and usage instructions
+- Verify prescription requirements
+- Check stock availability
+- Identify active ingredients
+- Suggest available alternatives
 
-### מה המערכת לא עושה ❌
+### What the System Does NOT Do ❌
 
-- לא נותנת ייעוץ רפואי
-- לא מעודדת רכישה
-- לא מבצעת אבחון
-- לא ממליצה על טיפול רפואי
+- Does not provide medical advice
+- Does not encourage purchases
+- Does not perform diagnosis
+- Does not recommend medical treatment
 
-## 🚀 תכונות
-
-### ממשק מאוחד ⭐
-- **קלט גמיש**: כתוב או דבר - בחר מה שנוח לך
-- **פלט כפול**: תשובות מוצגות תמיד בטקסט ונשמעות בקול
-- **הצגת פונקציות**: כל קריאות הפונקציות מוצגות inline עם Input/Output מפורט
-- **מצב מפתח**: הצגה מפורטת של כל השיחה הטכנית עם ה-AI
-- **שליטה באודיו**: כפתור להשתקה/הפעלה של הקראת הקול
-- **זיהוי דיבור**: שימוש ב-Web Speech API לזיהוי דיבור בעברית
-- **סינתזת דיבור**: הקראת תשובות בקול בעברית באמצעות Web Speech Synthesis
-
-### כלים (Tools/Functions)
-
-1. **get_medication_by_name** - קבלת מידע מלא על תרופה
-2. **search_medications_by_ingredient** - חיפוש תרופות לפי מרכיב פעיל
-3. **check_prescription_requirement** - בדיקת דרישת מרשם
-4. **get_alternative_medications** - מציאת תחליפים זמינים
-
-## 🏗️ ארכיטקטורה
+## 🏗️ Architecture
 
 ```
-pharmacy-assistant/
+pharmacy-assistant-realtime/
 ├── src/
 │   ├── backend/                      # Python Backend
-│   │   ├── api/                      # API Layer
-│   │   │   ├── __init__.py
-│   │   │   └── server.py             # Flask server (main entry point)
-│   │   ├── services/                 # Business Logic
-│   │   │   ├── __init__.py
-│   │   │   ├── openai_service.py     # OpenAI API integration
-│   │   │   └── pharmacy_service.py   # Pharmacy database & tools
-│   │   ├── config/                   # Configuration
-│   │   │   ├── __init__.py
-│   │   │   └── prompts/              # AI prompts & function definitions
-│   │   │       ├── system-prompt.txt
-│   │   │       └── function-definitions.json
-│   │   └── __init__.py
+│   │   ├── api/
+│   │   │   └── server.py             # Flask server with Realtime endpoints
+│   │   ├── services/
+│   │   │   ├── realtime_service.py   # WebRTC session management
+│   │   │   └── pharmacy_service.py   # Medication database & functions
+│   │   └── config/
+│   │       └── prompts/              # AI prompts & function definitions
+│   │           ├── system-prompt.txt
+│   │           └── function-definitions.json
 │   └── frontend/                     # Frontend
-│       ├── public/                   # HTML pages
-│       │   ├── index.html            # Landing page
-│       │   └── unified.html          # Main unified interface
-│       └── assets/                   # Static assets
-│           ├── js/                   # JavaScript files
-│           │   ├── unified-client.js # Client logic for unified interface
-│           │   └── mock-api.js       # Frontend medication database
-│           └── css/                  # Stylesheets
-│               └── styles.css        # Main styles (RTL-aware)
-├── run.py                            # Application launcher script
+│       ├── public/
+│       │   └── unified-realtime.html # Main voice interface
+│       └── assets/
+│           ├── js/
+│           │   ├── rtc-manager.js           # WebRTC connection handler
+│           │   ├── event-handler.js         # Realtime API event processor
+│           │   └── unified-realtime-client.js # Client logic
+│           └── css/
+│               └── styles.css        # Styles (RTL-aware)
+├── run.py                            # Application launcher
 ├── requirements.txt                  # Python dependencies
-├── .env                              # Environment variables (git-ignored)
-├── .env.example                      # Environment variables template
-├── .gitignore                        # Git ignore rules
 └── README.md                         # This file
 ```
 
-### ארכיטקטורת Backend
+## 📦 Installation
 
-```
-┌─────────────────────────────┐
-│      API Layer (api/)       │
-│  - server.py (Flask routes) │
-│  - Handles HTTP requests    │
-└──────────┬──────────────────┘
-           │
-           ▼
-┌─────────────────────────────┐
-│  Services Layer (services/) │
-│  - openai_service.py        │
-│  - pharmacy_service.py      │
-│  - Business logic           │
-└──────────┬──────────────────┘
-           │
-           ▼
-┌─────────────────────────────┐
-│   Config Layer (config/)    │
-│  - System prompts           │
-│  - Function definitions     │
-└─────────────────────────────┘
-```
-
-### ארכיטקטורת Frontend
-
-```
-┌─────────────────────────────┐
-│    Public Pages (public/)   │
-│  - index.html (landing)     │
-│  - unified.html (main app)  │
-└──────────┬──────────────────┘
-           │
-           ▼
-┌─────────────────────────────┐
-│    Assets (assets/)         │
-│  - JavaScript (js/)         │
-│  - Stylesheets (css/)       │
-└─────────────────────────────┘
-```
-
-## 📦 התקנה
-
-### דרישות מקדימות
+### Prerequisites
 
 - Python 3.8+
-- OpenAI API Key
-- דפדפן מודרני (Chrome, Firefox, Safari, Edge) עם תמיכה ב-Web Speech API
+- OpenAI API Key with Realtime API access
+- Modern browser (Chrome, Firefox, Safari, Edge) with WebRTC support
 
-### שלבי התקנה
+### Installation Steps
 
-1. **Clone הפרויקט:**
+1. **Clone the project:**
 ```bash
 git clone <repository-url>
-cd pharmacy-assistant
+cd pharmacy-assistant-realtime
 ```
 
-2. **צור סביבה וירטואלית:**
+2. **Create virtual environment:**
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate  # Linux/Mac
-# או
+# or
 .venv\Scripts\activate  # Windows
 ```
 
-3. **התקן תלויות:**
+3. **Install dependencies:**
 ```bash
 pip install -r requirements.txt
 ```
 
-4. **הגדר משתני סביבה:**
+4. **Configure environment:**
 ```bash
 cp .env.example .env
 ```
-ערוך את הקובץ `.env` והכנס את ה-API key שלך:
+Edit `.env` and add your API key:
 ```
 OPENAI_API_KEY=sk-your-api-key-here
 ```
 
-## 🚀 הרצה
+## 🚀 Running the Application
 
-### התחלה מהירה
+### Quick Start
 
-פשוט הרץ את סקריפט ההפעלה:
+Simply run the launch script:
 
 ```bash
 python3 run.py
 ```
 
-השרת יעלה ויהיה זמין בכתובות הבאות:
-- **דף הבית**: http://localhost:8080/
-- **ממשק מאוחד**: http://localhost:8080/unified.html
-- **Health Check**: http://localhost:8080/health
+The server will start and be available at:
+- **Realtime Interface**: http://localhost:8080/
 
-### הרצה ידנית (אופציונלי)
-
-אם אתה רוצה להריץ את השרת ידנית:
+### Manual Start (Optional)
 
 ```bash
 cd src/backend
 python3 -m api.server
 ```
 
-### עצירת השרת
+### Stopping the Server
 
-לחץ `Ctrl+C` בטרמינל כדי לעצור את השרת.
+Press `Ctrl+C` in the terminal to stop the server.
 
-## 💡 שימוש
+## 💡 Usage
 
-### ממשק מאוחד (Unified Interface)
+### Voice Interface
 
-1. פתח את הדפדפן בכתובת: http://localhost:8080/unified.html
-2. בחר את אופן התקשורת:
-   - **כתיבה**: הקלד שאלה בשדה הטקסט ולחץ "שלח"
-   - **דיבור**: לחץ על כפתור המיקרופון 🎤 ודבר בעברית
-3. התגובה תוצג בטקסט ותושמע בקול
-4. כפתורי שליטה:
-   - 🔧 **מצב מפתח**: הצגת פרטים טכניים
-   - 🔊/🔇 **אודיו**: השתקה/הפעלה של הקראת קול
-   - 🗑️ **ניקוי**: מחיקת השיחה והתחלה מחדש
+1. Open browser at: http://localhost:8080/
+2. Click the microphone button 🎤
+3. Grant microphone permission when prompted
+4. Start speaking naturally - the AI is always listening!
+5. The AI will respond with both text and voice
 
-### דוגמאות לשאלות
+### Control Buttons
 
-#### מידע על תרופה
+- **🎤 Microphone**: Start/stop voice conversation
+- **⚙️ Developer Mode**: Show function calls and technical details
+- **🔊/🔇 Audio**: Mute/unmute AI voice output
+- **🗑️ Clear**: Clear conversation and restart
+
+### Example Questions
+
+#### Medication Information
 ```
 "מה זה נורופן?"
 "ספר לי על אקמול"
 ```
 
-#### בדיקת מלאי
+#### Stock Check
 ```
 "יש לכם נורופן במלאי?"
 "נורופן 400 זמין?"
 ```
 
-#### חיפוש לפי מרכיב
+#### Search by Ingredient
 ```
 "אילו תרופות יש עם איבופרופן?"
 "מה יש עם פרצטמול?"
 ```
 
-#### דרישת מרשם
+#### Prescription Requirements
 ```
 "האם ונטולין דורש מרשם?"
 "נורופן צריך מרשם?"
 ```
 
-#### חיפוש תחליפים
+#### Find Alternatives
 ```
 "מה התחליף לאופטלגין?"
 "יש תחליף לנורופן?"
@@ -243,15 +174,31 @@ python3 -m api.server
 
 ## 🔧 API Endpoints
 
-### POST /chat
-שליחת הודעות צ'אט ל-AI
+### POST /session
+Create WebRTC session with OpenAI Realtime API
 
-**Request Body:**
+**Request:**
+```
+Content-Type: application/sdp
+Body: <SDP offer from client>
+```
+
+**Response:**
+```
+Content-Type: application/sdp
+Body: <SDP answer from OpenAI>
+```
+
+### POST /execute-function
+Execute a pharmacy function
+
+**Request:**
 ```json
 {
-  "messages": [
-    {"role": "user", "content": "יש לכם נורופן?"}
-  ]
+  "function_name": "get_medication_by_name",
+  "arguments": {
+    "name": "נורופן"
+  }
 }
 ```
 
@@ -259,19 +206,16 @@ python3 -m api.server
 ```json
 {
   "success": true,
-  "message": "כן, נורופן זמין במלאי שלנו...",
-  "tool_calls": [
-    {
-      "name": "get_medication_by_name",
-      "arguments": {"name": "נורופן"},
-      "result": {...}
-    }
-  ]
+  "medication": {
+    "name_he": "נורופן",
+    "active_ingredient": "איבופרופן",
+    ...
+  }
 }
 ```
 
 ### GET /health
-בדיקת תקינות השרת
+Health check endpoint
 
 **Response:**
 ```json
@@ -280,65 +224,86 @@ python3 -m api.server
 }
 ```
 
-### GET /api
-מידע על ה-API
+## 🧪 How It Works
 
-**Response:**
-```json
-{
-  "name": "Pharmacy Assistant Chat API",
-  "version": "1.0.0",
-  "status": "running",
-  "endpoints": {...}
-}
-```
+### 1. WebRTC Connection
+- Client creates peer connection
+- Sends SDP offer to backend
+- Backend forwards to OpenAI Realtime API
+- OpenAI returns SDP answer
+- Direct audio streaming established
 
-## 🧪 פיתוח
+### 2. Voice Activity Detection (VAD)
+- Server-side detection (threshold: 0.7)
+- Automatically detects when user speaks
+- No button clicking required during conversation
 
-### מבנה קוד מומלץ
+### 3. Real-time Transcription
+- Speech-to-text as you speak
+- Both user and AI speech transcribed
+- Displayed in real-time in the interface
 
-- **Backend Services**: כל לוגיקה עסקית ב-`src/backend/services/`
-- **API Routes**: נתיבי HTTP ב-`src/backend/api/`
-- **Config**: הגדרות ופרומפטים ב-`src/backend/config/`
-- **Frontend**: HTML, CSS, JS ב-`src/frontend/`
+### 4. Function Calling
+- AI detects need for medication information
+- Frontend calls `/execute-function` endpoint
+- Backend executes pharmacy function
+- Result sent back to AI via WebRTC
+- AI continues conversation with the information
 
-### הוספת תרופה חדשה
+## 💰 Cost Estimate
 
-ערוך את `src/backend/services/pharmacy_service.py` והוסף אובייקט ל-`MEDICATIONS_DB`:
+**Realtime API Pricing:**
+- Audio input: $0.06/min
+- Audio output: $0.24/min
+- ~$0.30 per minute of conversation
 
-```python
-{
-    "name_he": "שם התרופה בעברית",
-    "name_en": "English Name",
-    "active_ingredient": "מרכיב פעיל",
-    "strength_mg": [100, 200],
-    "instructions_dosage": "הוראות שימוש...",
-    "in_stock": True,
-    "requires_prescription": False,
-    "category": "קטגוריה",
-    "warnings": "אזהרות..."
-}
-```
+**Example:**
+- 100 conversations/day
+- 2 minutes average
+- = $60/day = $1,800/month
 
-### שינוי התנהגות AI
+**Optimization Tips:**
+- Set max conversation length
+- Implement session timeouts
+- Monitor usage patterns
 
-ערוך את `src/backend/config/prompts/system-prompt.txt` לשינוי ההתנהגות והטון של ה-AI.
+## ⚠️ Important Warnings
 
-## 📝 רישיון
+- The system provides **factual information only** and does not replace professional medical advice
+- Always consult a licensed pharmacist or doctor for medical advice
+- The medication database is mock (demonstration) and does not represent real inventory
+- Do not use this system for making medical decisions
 
-פרויקט זה הוא לצרכי הדגמה בלבד. אין להשתמש בו לצורך ייעוץ רפואי אמיתי ללא אישור מקצועי.
+## 🐛 Troubleshooting
 
-## ⚠️ אזהרות חשובות
+### "Session creation failed"
+**Check:**
+1. OpenAI API key in `.env`
+2. API key has Realtime API access
+3. Backend terminal for error logs
 
-- המערכת מספקת **מידע עובדתי בלבד** ואינה מחליפה ייעוץ רפואי מקצועי
-- לייעוץ רפואי פנה תמיד לרוקח או רופא מוסמך
-- מאגר התרופות הוא mock (הדגמה) ואינו מייצג מלאי אמיתי
-- אין להשתמש במערכת זו לקבלת החלטות רפואיות
+### "No audio"
+**Check:**
+1. Microphone permission granted
+2. 🔊 button not muted
+3. System audio not muted
+4. Browser console for errors
 
-## 🙋 תמיכה
+### "Functions not working"
+**Check:**
+1. Backend `/execute-function` endpoint running
+2. pharmacy_service.py has all functions
+3. Developer mode to see function calls
 
-לשאלות או בעיות, פתח Issue בריפוזיטורי או צור קשר עם מפתח הפרויקט.
+## 📚 Resources
+
+- [OpenAI Realtime API Docs](https://platform.openai.com/docs/guides/realtime)
+- [WebRTC Documentation](https://webrtc.org/getting-started/overview)
+
+## 📝 License
+
+This project is for demonstration purposes only. Do not use for actual medical advice without professional approval.
 
 ---
 
-**Built with ❤️ using Flask, OpenAI API, and Web Speech API**
+**Built with ❤️ using Flask, OpenAI Realtime API, and WebRTC**

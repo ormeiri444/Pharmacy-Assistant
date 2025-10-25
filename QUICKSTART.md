@@ -1,113 +1,84 @@
-# Quick Start Guide - התחלה מהירה
+# 🚀 Quick Start Guide - Realtime Voice Assistant
 
-## English
+Get your pharmacy voice assistant running in 5 minutes!
 
-### 1. Install Dependencies
+## Prerequisites
+
+- Python 3.8+
+- OpenAI API Key with Realtime API access
+- Modern browser with microphone
+
+## Installation
+
 ```bash
+# 1. Clone and navigate
+git clone <repository-url>
+cd pharmacy-assistant-realtime
+
+# 2. Create virtual environment
 python3 -m venv .venv
-source .venv/bin/activate
+source .venv/bin/activate  # Mac/Linux
+# or .venv\Scripts\activate on Windows
+
+# 3. Install dependencies
 pip install -r requirements.txt
-```
 
-### 2. Set up API Key
-```bash
+# 4. Configure API key
 cp .env.example .env
-# Edit .env and add your OpenAI API key
+# Edit .env and add: OPENAI_API_KEY=sk-your-key-here
 ```
 
-### 3. Run the Application
+## Run
+
 ```bash
 python3 run.py
 ```
 
-### 4. Open in Browser
-Navigate to: http://localhost:8080/unified.html
+Open browser at: **http://localhost:8080/**
 
----
+## Usage
 
-## עברית
+1. Click the microphone button 🎤
+2. Grant microphone permission
+3. Start speaking naturally!
 
-### 1. התקן תלויות
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-```
+### Try These Questions:
 
-### 2. הגדר API Key
-```bash
-cp .env.example .env
-# ערוך את קובץ .env והוסף את ה-OpenAI API key שלך
-```
+- "יש לכם נורופן?" (Do you have Nurofen?)
+- "מה זה אקמול?" (What is Acamol?)
+- "האם ונטולין דורש מרשם?" (Does Ventolin require prescription?)
 
-### 3. הרץ את האפליקציה
-```bash
-python3 run.py
-```
+## Features
 
-### 4. פתח בדפדפן
-נווט לכתובת: http://localhost:8080/unified.html
-
----
-
-## Project Structure
-
-```
-pharmacy-assistant/
-├── src/
-│   ├── backend/              # Python Backend
-│   │   ├── api/             # Flask API routes
-│   │   ├── services/        # Business logic
-│   │   └── config/          # Configuration & prompts
-│   └── frontend/            # Frontend assets
-│       ├── public/          # HTML pages
-│       └── assets/          # JS, CSS files
-├── run.py                   # Main launcher
-└── requirements.txt         # Python dependencies
-```
-
-## Key Files
-
-- **run.py** - Start the application
-- **src/backend/api/server.py** - Flask server with all routes
-- **src/backend/services/pharmacy_service.py** - Medication database (16 medications)
-- **src/backend/services/openai_service.py** - OpenAI API integration
-- **src/frontend/public/unified.html** - Main user interface
-- **src/frontend/assets/js/unified-client.js** - Frontend logic
-
-## API Endpoints
-
-- `GET /` - Landing page
-- `GET /unified.html` - Main unified interface
-- `POST /chat` - Chat with AI
-- `GET /health` - Health check
-- `GET /api` - API information
-
-## Development Tips
-
-1. **Add new medication**: Edit `src/backend/services/pharmacy_service.py`
-2. **Change AI behavior**: Edit `src/backend/config/prompts/system-prompt.txt`
-3. **Modify UI**: Edit `src/frontend/public/unified.html` and `src/frontend/assets/css/styles.css`
-4. **Change frontend logic**: Edit `src/frontend/assets/js/unified-client.js`
+- ⚡ **Ultra-low latency** (200-500ms)
+- 🎤 **Always listening** - no button clicks needed
+- 🗣️ **Natural AI voice** - not robotic TTS
+- 📝 **Real-time transcription** - see what's being said
+- 🔧 **Function calling** - medication info, stock, alternatives
 
 ## Troubleshooting
 
-**Port 8080 already in use?**
-```bash
-lsof -ti:8080 | xargs kill -9
-```
+### No audio?
+- Check microphone permission
+- Unmute the 🔊 button
+- Check system audio settings
 
-**Module not found errors?**
-```bash
-# Make sure you're in the project root directory
-# and virtual environment is activated
-source .venv/bin/activate
-```
+### Session failed?
+- Verify OpenAI API key in `.env`
+- Ensure you have Realtime API access
+- Check backend logs for errors
 
-**OpenAI API errors?**
-- Check that `.env` file exists and has valid `OPENAI_API_KEY`
-- Ensure you have credits in your OpenAI account
+### Functions not working?
+- Enable developer mode (⚙️ button)
+- Check backend terminal for errors
+- Verify pharmacy_service.py exists
+
+## Next Steps
+
+- Read [README.md](README.md) for full documentation
+- Customize system prompt in `src/backend/config/prompts/system-prompt.txt`
+- Add more medications in `src/backend/services/pharmacy_service.py`
 
 ---
 
-**Need Help?** Check the full [README.md](README.md) for detailed documentation.
+**Need help?** Check the full README or backend logs for detailed error messages.

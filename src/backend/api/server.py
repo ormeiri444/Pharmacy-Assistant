@@ -1,5 +1,6 @@
 """
-Simple Flask server for pharmacy assistant chat
+Realtime API Server for Pharmacy Assistant
+WebRTC-based voice assistant using OpenAI Realtime API
 """
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
@@ -10,10 +11,8 @@ from pathlib import Path
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from services.openai_service import chat_completion, get_client
 from services.realtime_service import create_realtime_session
 from dotenv import load_dotenv
-import json
 
 load_dotenv()
 
@@ -24,32 +23,6 @@ frontend_path = project_root / 'src' / 'frontend'
 # Set the static folder to the frontend directory
 app = Flask(__name__, static_folder=str(frontend_path / 'public'), static_url_path='')
 CORS(app)
-
-
-@app.route('/chat', methods=['POST'])
-def chat():
-    """Handle chat requests"""
-    try:
-        data = request.json
-        messages = data.get('messages', [])
-        
-        # Get response from OpenAI
-        result = chat_completion(messages)
-        
-        return jsonify({
-            "success": True,
-            "message": result['message'],
-            "tool_calls": result.get('tool_calls')
-        })
-        
-    except Exception as e:
-        print(f"Error in chat endpoint: {e}")
-        import traceback
-        traceback.print_exc()
-        return jsonify({
-            "success": False,
-            "error": str(e)
-        }), 500
 
 
 @app.route('/session', methods=['POST'])
@@ -108,33 +81,10 @@ def execute_tool():
         }), 500
 
 
-@app.route('/realtime/token', methods=['POST'])
-def get_realtime_token():
-    """Get ephemeral token for OpenAI Realtime API"""
-    try:
-        # For the Realtime API, we need to return the API key itself
-        # as an ephemeral token. In production, you would create a
-        # short-lived token, but for development we use the API key directly.
-        api_key = os.getenv('OPENAI_API_KEY')
-        if not api_key:
-            raise ValueError("OPENAI_API_KEY environment variable is not set")
-
-        return jsonify({
-            "token": api_key
-        })
-
-    except Exception as e:
-        print(f"Error getting realtime token: {e}")
-        return jsonify({
-            "success": False,
-            "error": str(e)
-        }), 500
-
-
 @app.route('/')
 def serve_index():
-    """Serve the main index.html page"""
-    return send_from_directory(app.static_folder, 'index.html')
+    """Serve the Realtime interface"""
+    return send_from_directory(app.static_folder, 'unified-realtime.html')
 
 
 @app.route('/assets/<path:path>')
@@ -154,12 +104,12 @@ def serve_static(path):
 def api_info():
     """API information endpoint"""
     return jsonify({
-        "name": "Pharmacy Assistant Chat API",
-        "version": "1.0.0",
+        "name": "Pharmacy Assistant Realtime API",
+        "version": "2.0.0",
         "status": "running",
         "endpoints": {
-            "/chat": "POST - Send chat messages",
-            "/realtime/token": "POST - Get ephemeral token for Realtime API",
+            "/session": "POST - Create WebRTC session with OpenAI Realtime API",
+            "/execute-function": "POST - Execute pharmacy functions",
             "/health": "GET - Health check"
         }
     })
@@ -172,7 +122,7 @@ def health():
 
 
 if __name__ == '__main__':
-    print("Starting Pharmacy Assistant Chat Server...")
+    print("Starting Pharmacy Assistant Realtime Server...")
     print("Server running on http://localhost:8080")
-    print("Frontend available at http://localhost:8080/index.html")
+    print("Realtime Interface: http://localhost:8080/")
     app.run(debug=True, port=8080, host='0.0.0.0')

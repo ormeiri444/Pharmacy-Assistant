@@ -234,49 +234,12 @@ async function handleSubmit(e) {
     messageInput.value = '';
 
     if (isConnected && voiceEnabled) {
-        // Use WebRTC if voice is active
+        // Use WebRTC to send text message
         rtcManager.sendTextMessage(message);
     } else {
-        // Fallback to regular Chat API
-        showTyping(true);
-        sendButton.disabled = true;
-
-        try {
-            const response = await fetch('http://localhost:8080/chat', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    messages: [
-                        { role: 'user', content: message }
-                    ]
-                })
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-                // Show tool calls in developer mode
-                if (data.tool_calls && data.tool_calls.length > 0 && developerModeEnabled) {
-                    data.tool_calls.forEach(toolCall => {
-                        showFunctionCall(toolCall.name, toolCall.arguments, toolCall.result);
-                    });
-                }
-
-                // Add bot response
-                addMessage(data.message, 'bot');
-            } else {
-                addMessage('מצטער, אירעה שגיאה. אנא נסה שוב.', 'bot');
-            }
-        } catch (error) {
-            console.error('[UnifiedClient] Error:', error);
-            addMessage('מצטער, לא הצלחתי להתחבר לשרת.', 'bot');
-        } finally {
-            showTyping(false);
-            sendButton.disabled = false;
-            messageInput.focus();
-        }
+        // Voice not connected - prompt user to start voice conversation
+        addMessage('אנא לחץ על כפתור המיקרופון 🎤 להתחלת שיחה קולית תחילה.', 'bot');
+        messageInput.focus();
     }
 }
 

@@ -15,12 +15,15 @@ from api.server import app
 
 if __name__ == '__main__':
     print("=" * 60)
-    print("🏥 Pharmacy Assistant Chat Server")
+    print("🏥 Pharmacy Assistant - Realtime Voice API")
     print("=" * 60)
     print()
     print("Server running on: http://localhost:8080")
-    print("Main Interface:    http://localhost:8080/unified.html")
-    print("Landing Page:      http://localhost:8080/")
+    print("Realtime Interface: http://localhost:8080/")
+    print()
+    print("⚡ WebRTC-based voice assistant with ultra-low latency")
+    print("🎤 Always-listening voice interaction")
+    print("🔧 Function calling for medication information")
     print()
     print("Press Ctrl+C to stop the server")
     print("=" * 60)
