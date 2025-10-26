@@ -63,7 +63,7 @@ def create_realtime_session(sdp_offer, language='he'):
         "input_audio_format": "pcm16",
         "output_audio_format": "pcm16",
         "input_audio_transcription": {
-            "model": "whisper-1",
+            "model": "gpt-4o-transcribe",
             "language": "he"  # Force Hebrew language recognition only
         },
         "turn_detection": {
