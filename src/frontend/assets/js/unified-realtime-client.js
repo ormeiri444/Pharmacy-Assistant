@@ -10,6 +10,7 @@ let eventHandler = null;
 let developerModeEnabled = false;
 let isConnected = false;
 let voiceEnabled = false;
+let microphoneActive = false;
 let audioContext = null;
 
 // DOM Elements
@@ -70,7 +71,7 @@ document.addEventListener('DOMContentLoaded', async () => {
  * Toggle voice conversation on/off
  */
 async function toggleVoiceConversation() {
-    console.log('[UnifiedClient] toggleVoiceConversation called, voiceEnabled:', voiceEnabled);
+    console.log('[UnifiedClient] toggleVoiceConversation called, microphoneActive:', microphoneActive);
     
     // Prevent double-clicks
     if (voiceInputBtn.disabled) {
@@ -78,10 +79,10 @@ async function toggleVoiceConversation() {
         return;
     }
 
-    if (!voiceEnabled) {
-        // Start voice conversation
+    if (!isConnected) {
+        // Need to establish connection first
         try {
-            console.log('[UnifiedClient] Starting voice conversation...');
+            console.log('[UnifiedClient] Establishing connection...');
             voiceInputBtn.disabled = true;
             voiceIcon.textContent = '⏳';
             voiceStatusText.textContent = 'מתחבר...';
@@ -90,47 +91,58 @@ async function toggleVoiceConversation() {
             await initializeConnection();
 
             voiceEnabled = true;
+            isConnected = true;
+            microphoneActive = true;
+            
+            // Unmute microphone
+            rtcManager.unmuteMicrophone();
+            
             voiceIcon.textContent = '🔴';
             voiceInputBtn.style.background = '#28a745';
-            voiceInputBtn.title = 'לחץ לעצירת שיחה קולית';
+            voiceInputBtn.title = 'לחץ להשתקת מיקרופון';
             voiceInputBtn.disabled = false;
-
-            // Show voice status indicator
             voiceStatus.style.display = 'block';
 
-            addMessage('✅ שיחה קולית מחוברת! המיקרופון מקשיב - דבר בחופשיות', 'bot');
-            console.log('[UnifiedClient] Voice conversation started, voiceEnabled:', voiceEnabled);
+            addMessage('✅ מחובר! המיקרופון פעיל - דבר בחופשיות', 'bot');
+            console.log('[UnifiedClient] Connection established, microphone active');
         } catch (error) {
-            console.error('[UnifiedClient] Failed to start voice:', error);
-            addMessage('מצטער, לא הצלחתי להתחבר לשיחה קולית. אנא נסה שוב.', 'bot');
+            console.error('[UnifiedClient] Failed to connect:', error);
+            addMessage('מצטער, לא הצלחתי להתחבר. אנא נסה שוב.', 'bot');
             voiceEnabled = false;
+            isConnected = false;
+            microphoneActive = false;
             voiceIcon.textContent = '🎤';
             voiceInputBtn.style.background = 'var(--primary-color)';
             voiceStatus.style.display = 'none';
             voiceInputBtn.disabled = false;
         }
     } else {
-        // Stop voice conversation
-        console.log('[UnifiedClient] Stopping voice conversation...');
-        voiceInputBtn.disabled = true;
-        
-        if (rtcManager) {
-            rtcManager.cleanup();
+        // Connection exists - toggle microphone only
+        if (microphoneActive) {
+            // Mute microphone
+            console.log('[UnifiedClient] Muting microphone...');
+            rtcManager.muteMicrophone();
+            microphoneActive = false;
+            
+            voiceIcon.textContent = '🎤';
+            voiceInputBtn.style.background = 'var(--primary-color)';
+            voiceInputBtn.title = 'לחץ להפעלת מיקרופון';
+            voiceStatus.style.display = 'none';
+            
+            console.log('[UnifiedClient] Microphone muted');
+        } else {
+            // Unmute microphone
+            console.log('[UnifiedClient] Unmuting microphone...');
+            rtcManager.unmuteMicrophone();
+            microphoneActive = true;
+            
+            voiceIcon.textContent = '🔴';
+            voiceInputBtn.style.background = '#28a745';
+            voiceInputBtn.title = 'לחץ להשתקת מיקרופון';
+            voiceStatus.style.display = 'block';
+            
+            console.log('[UnifiedClient] Microphone active');
         }
-        if (eventHandler) {
-            eventHandler.reset();
-        }
-
-        voiceEnabled = false;
-        isConnected = false;
-        voiceIcon.textContent = '🎤';
-        voiceInputBtn.style.background = 'var(--primary-color)';
-        voiceInputBtn.title = 'לחץ להתחלת שיחה קולית';
-        voiceStatus.style.display = 'none';
-        voiceInputBtn.disabled = false;
-
-        addMessage('🔴 שיחה קולית הופסקה. לחץ על המיקרופון להתחלה מחדש.', 'bot');
-        console.log('[UnifiedClient] Voice conversation stopped');
     }
 }
 
@@ -239,32 +251,46 @@ async function handleSubmit(e) {
     // Clear input
     messageInput.value = '';
 
-    if (isConnected && voiceEnabled) {
-        // Use WebRTC to send text message
+    if (isConnected) {
+        // Connection exists - mute microphone and send text message
+        if (microphoneActive) {
+            console.log('[UnifiedClient] Muting microphone for text input');
+            rtcManager.muteMicrophone();
+            microphoneActive = false;
+            voiceIcon.textContent = '🎤';
+            voiceInputBtn.style.background = 'var(--primary-color)';
+            voiceInputBtn.title = 'לחץ להפעלת מיקרופון';
+            voiceStatus.style.display = 'none';
+        }
+        
+        // Send text message through existing connection
         rtcManager.sendTextMessage(message);
     } else {
-        // Voice not connected - start connection automatically with initial message
+        // No connection - establish connection with microphone muted
         try {
-            addMessage('מתחבר לשיחה...', 'bot');
+            console.log('[UnifiedClient] Establishing connection for text input...');
             
             // Pass the message to be sent after connection is established
             await initializeConnection(message);
             
             voiceEnabled = true;
+            isConnected = true;
+            microphoneActive = false; // Start with mic muted for text input
             
-            // Update UI to show voice is active
-            voiceIcon.textContent = '🔴';
-            voiceInputBtn.style.background = '#28a745';
-            voiceInputBtn.title = 'לחץ לעצירת שיחה קולית';
-            voiceStatus.style.display = 'block';
+            // Keep microphone muted (already muted by default in setupMicrophone)
+            voiceIcon.textContent = '🎤';
+            voiceInputBtn.style.background = 'var(--primary-color)';
+            voiceInputBtn.title = 'לחץ להפעלת מיקרופון';
+            voiceStatus.style.display = 'none';
             
-            addMessage('✅ מחובר! תוכל להמשיך לכתוב או לדבר', 'bot');
+            console.log('[UnifiedClient] Connection established for text input');
         } catch (error) {
             console.error('[UnifiedClient] Failed to auto-connect:', error);
             addMessage('מצטער, לא הצלחתי להתחבר. אנא נסה שוב.', 'bot');
         }
-        messageInput.focus();
     }
+    
+    messageInput.focus();
 }
 
 /**
@@ -459,8 +485,8 @@ function clearChat() {
         currentInterimUserMessage = null;
         currentInterimAIMessage = null;
 
-        // Reset connection if voice was active
-        if (voiceEnabled) {
+        // Reset connection if active
+        if (isConnected) {
             if (rtcManager) {
                 rtcManager.cleanup();
             }
@@ -469,6 +495,7 @@ function clearChat() {
             }
             voiceEnabled = false;
             isConnected = false;
+            microphoneActive = false;
             voiceIcon.textContent = '🎤';
             voiceInputBtn.style.background = 'var(--primary-color)';
             voiceStatus.style.display = 'none';

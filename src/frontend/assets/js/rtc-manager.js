@@ -141,10 +141,13 @@ class RTCManager {
                 this.peerConnection.addTrack(track, this.localStream);
             });
 
+            // Start with microphone muted (will be unmuted when user clicks mic button)
+            this.muteMicrophone();
+
             // Set up audio level monitoring
             this.setupAudioLevelMonitoring();
 
-            console.log('[RTC] Microphone setup complete');
+            console.log('[RTC] Microphone setup complete (initially muted)');
         } catch (error) {
             console.error('[RTC] Microphone access failed:', error);
             
@@ -292,6 +295,39 @@ class RTCManager {
         this.sendEvent({
             type: 'response.create'
         });
+    }
+
+    /**
+     * Mute the microphone
+     */
+    muteMicrophone() {
+        if (this.localStream) {
+            this.localStream.getAudioTracks().forEach(track => {
+                track.enabled = false;
+                console.log('[RTC] Microphone muted');
+            });
+        }
+    }
+
+    /**
+     * Unmute the microphone
+     */
+    unmuteMicrophone() {
+        if (this.localStream) {
+            this.localStream.getAudioTracks().forEach(track => {
+                track.enabled = true;
+                console.log('[RTC] Microphone unmuted');
+            });
+        }
+    }
+
+    /**
+     * Check if microphone is muted
+     */
+    isMicrophoneMuted() {
+        if (!this.localStream) return true;
+        const audioTracks = this.localStream.getAudioTracks();
+        return audioTracks.length === 0 || !audioTracks[0].enabled;
     }
 
     /**
