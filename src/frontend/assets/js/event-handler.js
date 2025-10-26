@@ -154,15 +154,35 @@ class EventHandler {
         const itemId = event.item_id;
         const delta = event.delta;
 
+        // Initialize buffer if needed
         if (!this.buffers.transcripts[itemId]) {
-            this.buffers.transcripts[itemId] = '';
+            this.buffers.transcripts[itemId] = {
+                text: '',
+                contentIndex: event.content_index || 0
+            };
         }
 
-        this.buffers.transcripts[itemId] += delta;
+        // Handle content_index to ensure proper ordering
+        // If content_index is provided, it indicates where this delta belongs
+        if (event.content_index !== undefined) {
+            // If we're getting a new content_index, it might be a replacement
+            if (event.content_index < this.buffers.transcripts[itemId].contentIndex) {
+                // This is a correction/replacement - reset from this point
+                this.buffers.transcripts[itemId].text = delta;
+                this.buffers.transcripts[itemId].contentIndex = event.content_index;
+            } else {
+                // Normal append
+                this.buffers.transcripts[itemId].text += delta;
+                this.buffers.transcripts[itemId].contentIndex = event.content_index;
+            }
+        } else {
+            // No content_index, just append (fallback behavior)
+            this.buffers.transcripts[itemId].text += delta;
+        }
 
         // Show interim transcript in UI
         if (this.uiCallbacks.onUserSpeechInterim) {
-            this.uiCallbacks.onUserSpeechInterim(this.buffers.transcripts[itemId]);
+            this.uiCallbacks.onUserSpeechInterim(this.buffers.transcripts[itemId].text);
         }
     }
 
@@ -171,7 +191,13 @@ class EventHandler {
      */
     handleInputAudioTranscriptionCompleted(event) {
         const itemId = event.item_id;
-        const transcript = event.transcript || this.buffers.transcripts[itemId] || '';
+        
+        // Use the final transcript from the event, or fall back to buffered text
+        let transcript = event.transcript;
+        if (!transcript && this.buffers.transcripts[itemId]) {
+            transcript = this.buffers.transcripts[itemId].text || '';
+        }
+        transcript = transcript || '';
 
         console.log('[EventHandler] User speech transcribed:', transcript);
 
@@ -215,15 +241,34 @@ class EventHandler {
         const itemId = event.item_id;
         const delta = event.delta;
 
+        // Initialize buffer if needed
         if (!this.buffers.audioTranscripts[itemId]) {
-            this.buffers.audioTranscripts[itemId] = '';
+            this.buffers.audioTranscripts[itemId] = {
+                text: '',
+                contentIndex: event.content_index || 0
+            };
         }
 
-        this.buffers.audioTranscripts[itemId] += delta;
+        // Handle content_index to ensure proper ordering
+        if (event.content_index !== undefined) {
+            // If we're getting a new content_index, it might be a replacement
+            if (event.content_index < this.buffers.audioTranscripts[itemId].contentIndex) {
+                // This is a correction/replacement - reset from this point
+                this.buffers.audioTranscripts[itemId].text = delta;
+                this.buffers.audioTranscripts[itemId].contentIndex = event.content_index;
+            } else {
+                // Normal append
+                this.buffers.audioTranscripts[itemId].text += delta;
+                this.buffers.audioTranscripts[itemId].contentIndex = event.content_index;
+            }
+        } else {
+            // No content_index, just append (fallback behavior)
+            this.buffers.audioTranscripts[itemId].text += delta;
+        }
 
         // Show interim AI message
         if (this.uiCallbacks.onAIMessageInterim) {
-            this.uiCallbacks.onAIMessageInterim(this.buffers.audioTranscripts[itemId]);
+            this.uiCallbacks.onAIMessageInterim(this.buffers.audioTranscripts[itemId].text);
         }
     }
 
@@ -232,7 +277,13 @@ class EventHandler {
      */
     handleAudioTranscriptDone(event) {
         const itemId = event.item_id;
-        const transcript = event.transcript || this.buffers.audioTranscripts[itemId] || '';
+        
+        // Use the final transcript from the event, or fall back to buffered text
+        let transcript = event.transcript;
+        if (!transcript && this.buffers.audioTranscripts[itemId]) {
+            transcript = this.buffers.audioTranscripts[itemId].text || '';
+        }
+        transcript = transcript || '';
 
         console.log('[EventHandler] AI speech transcribed:', transcript);
 
