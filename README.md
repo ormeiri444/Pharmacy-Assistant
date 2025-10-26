@@ -2,6 +2,8 @@
 
 An AI-powered pharmacist assistant web application built for retail pharmacy chains, demonstrating advanced agent engineering with OpenAI's Realtime API and comprehensive LLM-based testing.
 
+![Pharmacy Home Page](images/pharamcy-homepage.png)
+
 ## Overview
 
 This project implements an intelligent pharmacy assistant that helps customers get factual information about medications through voice interactions. The assistant is designed with strict safety policies to ensure it provides helpful information while never crossing the line into medical advice or diagnosis.
