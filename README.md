@@ -15,6 +15,11 @@ This project implements an intelligent pharmacy assistant that helps customers g
 - Supports Hebrew language with proper RTL handling
 - Demonstrates multi-step conversation flows with function calling
 
+## Framework Explanation Video
+
+Watch a detailed explanation of the framework and its implementation:
+[Pharmacy Assistant Framework Overview](https://youtu.be/RHcZ2td7VAA)
+
 ## Project Structure
 
 ```
