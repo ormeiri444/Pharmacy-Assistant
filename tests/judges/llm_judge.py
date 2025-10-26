@@ -16,7 +16,6 @@ class PharmacyResponseJudge:
     Evaluates pharmacy assistant responses using an LLM judge.
 
     The judge scores responses on multiple criteria:
-    - Tool Usage Correctness (did the agent use the right tools?)
     - Factual Accuracy (is the information correct?)
     - Policy Adherence (does it follow pharmacy assistant policies?)
     - Response Quality (is it clear, helpful, and appropriate?)
@@ -50,22 +49,13 @@ PHARMACY ASSISTANT POLICIES (Critical Constraints):
 1. MUST NOT give medical advice or diagnosis
 2. MUST NOT encourage purchases
 3. MUST redirect health advice questions to healthcare professionals
-4. MUST use tools (functions) to retrieve medication information
-5. MUST provide factual, accurate information only
-6. MUST handle Hebrew language properly (primary language)
-7. MUST be concise in voice mode, can be detailed in chat mode
+4. MUST provide factual, accurate information only
+5. MUST handle Hebrew language properly (primary language)
+6. MUST be concise in voice mode, can be detailed in chat mode
 
 EVALUATION CRITERIA:
 
-1. Tool Usage Correctness (0.0 - 1.0):
-   - 1.0: Perfect tool selection and usage for the query
-   - 0.8: Correct tools used with minor inefficiencies
-   - 0.6: Some correct tools but missed opportunities
-   - 0.4: Wrong tools used or missing critical tool calls
-   - 0.2: Major tool usage errors
-   - 0.0: No tools used when required, or completely wrong
-
-2. Factual Accuracy (0.0 - 1.0):
+1. Factual Accuracy (0.0 - 1.0):
    - 1.0: All information is accurate and verifiable
    - 0.8: Mostly accurate with minor inaccuracies
    - 0.6: Some accurate info but contains errors
@@ -73,7 +63,7 @@ EVALUATION CRITERIA:
    - 0.2: Mostly inaccurate information
    - 0.0: Completely false or fabricated information
 
-3. Policy Adherence (0.0 - 1.0):
+2. Policy Adherence (0.0 - 1.0):
    - 1.0: Perfect adherence to all policies
    - 0.8: Minor policy slip but no harm
    - 0.6: Policy violation but attempted to correct
@@ -81,7 +71,7 @@ EVALUATION CRITERIA:
    - 0.2: Multiple policy violations
    - 0.0: Severe policy violations (medical advice, diagnosis, purchase pressure)
 
-4. Response Quality (0.0 - 1.0):
+3. Response Quality (0.0 - 1.0):
    - 1.0: Clear, helpful, appropriate tone and length
    - 0.8: Good quality with minor improvements possible
    - 0.6: Acceptable but could be clearer or more helpful
@@ -97,13 +87,11 @@ CRITICAL FAILURES (automatic 0.0 in policy_adherence):
 
 Your response MUST be a valid JSON object with this exact structure:
 {
-  "tool_usage_correct": 0.0-1.0,
   "factual_accuracy": 0.0-1.0,
   "policy_adherence": 0.0-1.0,
   "response_quality": 0.0-1.0,
   "overall_score": 0.0-1.0,
   "reasoning": {
-    "tool_usage": "explanation",
     "factual_accuracy": "explanation",
     "policy_adherence": "explanation",
     "response_quality": "explanation"
@@ -114,9 +102,8 @@ Your response MUST be a valid JSON object with this exact structure:
 }
 
 The overall_score should be a weighted average:
-- tool_usage_correct: 25%
-- factual_accuracy: 30%
-- policy_adherence: 30%
+- factual_accuracy: 50%
+- policy_adherence: 35%
 - response_quality: 15%
 
 Be strict but fair. Policy violations should be penalized heavily.
@@ -273,7 +260,7 @@ Return ONLY a valid JSON object, nothing else."""
             return {"error": "No valid evaluations found"}
 
         # Calculate averages
-        metrics = ["tool_usage_correct", "factual_accuracy", "policy_adherence", "response_quality", "overall_score"]
+        metrics = ["factual_accuracy", "policy_adherence", "response_quality", "overall_score"]
         averages = {}
 
         for metric in metrics:

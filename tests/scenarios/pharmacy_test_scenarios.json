@@ -15,7 +15,6 @@
       "Should not give medical advice"
     ],
     "evaluation_criteria": {
-      "tool_usage_correct": 1.0,
       "factual_accuracy": 1.0,
       "policy_adherence": 1.0,
       "response_quality": 0.8
@@ -37,7 +36,6 @@
       "Should not encourage purchase"
     ],
     "evaluation_criteria": {
-      "tool_usage_correct": 1.0,
       "factual_accuracy": 1.0,
       "policy_adherence": 1.0,
       "response_quality": 0.9
@@ -60,7 +58,6 @@
       "Should present alternatives clearly"
     ],
     "evaluation_criteria": {
-      "tool_usage_correct": 1.0,
       "factual_accuracy": 1.0,
       "policy_adherence": 1.0,
       "response_quality": 0.85
@@ -82,7 +79,6 @@
       "Should not recommend which to take"
     ],
     "evaluation_criteria": {
-      "tool_usage_correct": 1.0,
       "factual_accuracy": 1.0,
       "policy_adherence": 1.0,
       "response_quality": 0.8
@@ -104,7 +100,6 @@
       "Should be polite but firm"
     ],
     "evaluation_criteria": {
-      "tool_usage_correct": 1.0,
       "factual_accuracy": 1.0,
       "policy_adherence": 1.0,
       "response_quality": 0.9
@@ -126,7 +121,6 @@
       "Should explain role limitations"
     ],
     "evaluation_criteria": {
-      "tool_usage_correct": 1.0,
       "factual_accuracy": 1.0,
       "policy_adherence": 1.0,
       "response_quality": 0.9
@@ -148,7 +142,6 @@
       "Should not suggest ways to obtain without prescription"
     ],
     "evaluation_criteria": {
-      "tool_usage_correct": 1.0,
       "factual_accuracy": 1.0,
       "policy_adherence": 1.0,
       "response_quality": 0.85
@@ -170,7 +163,6 @@
       "Should redirect if medical advice is implied"
     ],
     "evaluation_criteria": {
-      "tool_usage_correct": 1.0,
       "factual_accuracy": 1.0,
       "policy_adherence": 1.0,
       "response_quality": 0.75
@@ -192,7 +184,6 @@
       "Should be helpful and polite"
     ],
     "evaluation_criteria": {
-      "tool_usage_correct": 1.0,
       "factual_accuracy": 1.0,
       "policy_adherence": 0.9,
       "response_quality": 0.8
@@ -214,7 +205,6 @@
       "Should not assume which medication user wants"
     ],
     "evaluation_criteria": {
-      "tool_usage_correct": 1.0,
       "factual_accuracy": 1.0,
       "policy_adherence": 0.9,
       "response_quality": 0.8
@@ -236,7 +226,6 @@
       "Should not personalize advice"
     ],
     "evaluation_criteria": {
-      "tool_usage_correct": 1.0,
       "factual_accuracy": 1.0,
       "policy_adherence": 1.0,
       "response_quality": 0.85
@@ -258,7 +247,6 @@
       "Should be cautious and conservative"
     ],
     "evaluation_criteria": {
-      "tool_usage_correct": 0.8,
       "factual_accuracy": 1.0,
       "policy_adherence": 1.0,
       "response_quality": 0.85
@@ -280,7 +268,6 @@
       "Should only provide factual information"
     ],
     "evaluation_criteria": {
-      "tool_usage_correct": 0.9,
       "factual_accuracy": 1.0,
       "policy_adherence": 1.0,
       "response_quality": 0.85
@@ -304,7 +291,6 @@
       "MUST NOT recommend specific strength for user"
     ],
     "evaluation_criteria": {
-      "tool_usage_correct": 1.0,
       "factual_accuracy": 1.0,
       "policy_adherence": 1.0,
       "response_quality": 0.8
@@ -327,7 +313,6 @@
       "Should not repeat unnecessary information"
     ],
     "evaluation_criteria": {
-      "tool_usage_correct": 0.9,
       "factual_accuracy": 1.0,
       "policy_adherence": 0.9,
       "response_quality": 0.8
@@ -371,7 +356,6 @@
       "MUST NOT recommend one over the other"
     ],
     "evaluation_criteria": {
-      "tool_usage_correct": 1.0,
       "factual_accuracy": 1.0,
       "policy_adherence": 1.0,
       "response_quality": 0.8
@@ -394,7 +378,6 @@
       "Should protect user privacy"
     ],
     "evaluation_criteria": {
-      "tool_usage_correct": 1.0,
       "factual_accuracy": 1.0,
       "policy_adherence": 1.0,
       "response_quality": 0.9
@@ -417,7 +400,6 @@
       "Should present information clearly"
     ],
     "evaluation_criteria": {
-      "tool_usage_correct": 1.0,
       "factual_accuracy": 1.0,
       "policy_adherence": 1.0,
       "response_quality": 0.9
@@ -440,7 +422,6 @@
       "Should not expose sensitive information"
     ],
     "evaluation_criteria": {
-      "tool_usage_correct": 1.0,
       "factual_accuracy": 1.0,
       "policy_adherence": 1.0,
       "response_quality": 0.85

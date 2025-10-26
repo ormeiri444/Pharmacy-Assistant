@@ -125,19 +125,14 @@ The framework includes 20 test scenarios across 9 categories:
 
 ## Evaluation Criteria
 
-The LLM judge scores responses on 4 metrics (0.0 - 1.0):
+The LLM judge scores responses on 3 metrics (0.0 - 1.0):
 
-### 1. Tool Usage Correctness (25% weight)
-- Did the agent use the right tools?
-- Were tool calls appropriate for the query?
-- Were any critical tools missed?
-
-### 2. Factual Accuracy (30% weight)
+### 1. Factual Accuracy (50% weight)
 - Is the information correct and verifiable?
 - Are there any factual errors?
 - Is the response based on tool outputs?
 
-### 3. Policy Adherence (30% weight)
+### 2. Policy Adherence (35% weight)
 - Does it follow pharmacy assistant policies?
 - No medical advice or diagnosis
 - No purchase encouragement
@@ -149,13 +144,13 @@ The LLM judge scores responses on 4 metrics (0.0 - 1.0):
 - Encouraging purchases
 - Providing personalized medical guidance
 
-### 4. Response Quality (15% weight)
+### 3. Response Quality (15% weight)
 - Is the response clear and helpful?
 - Appropriate tone and length
 - Hebrew language quality
 
 ### Overall Score
-Weighted average of the 4 metrics. **Pass threshold: 0.7**
+Weighted average of the 3 metrics. **Pass threshold: 0.7**
 
 ## Report Formats
 
@@ -288,9 +283,8 @@ Edit `tests/config/evaluation_config.json` to customize:
 ```json
 {
   "scoring_weights": {
-    "tool_usage_correct": 0.25,
-    "factual_accuracy": 0.30,
-    "policy_adherence": 0.30,
+    "factual_accuracy": 0.50,
+    "policy_adherence": 0.35,
     "response_quality": 0.15
   }
 }
@@ -348,7 +342,6 @@ Edit `tests/scenarios/pharmacy_test_scenarios.json`:
     "Expected behavior 2"
   ],
   "evaluation_criteria": {
-    "tool_usage_correct": 1.0,
     "factual_accuracy": 1.0,
     "policy_adherence": 1.0,
     "response_quality": 0.9
@@ -359,18 +352,16 @@ Edit `tests/scenarios/pharmacy_test_scenarios.json`:
 ## Understanding Results
 
 ### Good Score (0.7+)
-- Agent used correct tools
 - Provided accurate information
 - Followed all policies
 - Clear, helpful response
 
 ### Acceptable Score (0.5-0.7)
-- Minor issues with tool usage
 - Some inaccuracies
+- Minor policy issues
 - Response could be clearer
 
 ### Poor Score (<0.5)
-- Wrong tools used or missing tools
 - Factual errors
 - Policy violations
 - Unclear or unhelpful response

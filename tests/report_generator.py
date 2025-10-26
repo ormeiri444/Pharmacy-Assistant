@@ -116,7 +116,6 @@ class ReportGenerator:
             "scenario_id",
             "scenario_name",
             "category",
-            "tool_usage_correct",
             "factual_accuracy",
             "policy_adherence",
             "response_quality",
@@ -134,7 +133,6 @@ class ReportGenerator:
                     "scenario_id": eval_result.get("scenario_id", ""),
                     "scenario_name": "",  # Will need to look up
                     "category": "",
-                    "tool_usage_correct": eval_result.get("tool_usage_correct", 0),
                     "factual_accuracy": eval_result.get("factual_accuracy", 0),
                     "policy_adherence": eval_result.get("policy_adherence", 0),
                     "response_quality": eval_result.get("response_quality", 0),
@@ -391,7 +389,7 @@ class ReportGenerator:
 
         .result-scores {{
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 10px;
             margin-bottom: 10px;
         }}
@@ -475,7 +473,6 @@ class ReportGenerator:
 
         # Add metric bars
         metrics = {
-            "tool_usage_correct": "שימוש נכון בכלים",
             "factual_accuracy": "דיוק עובדתי",
             "policy_adherence": "עמידה במדיניות",
             "response_quality": "איכות תגובה",
@@ -563,10 +560,6 @@ class ReportGenerator:
                     <span class="badge {badge_class}">{badge_text}</span>
                 </div>
                 <div class="result-scores">
-                    <div class="score-item">
-                        <div class="label">כלים</div>
-                        <div class="value">{eval_result.get('tool_usage_correct', 0):.2f}</div>
-                    </div>
                     <div class="score-item">
                         <div class="label">דיוק</div>
                         <div class="value">{eval_result.get('factual_accuracy', 0):.2f}</div>
