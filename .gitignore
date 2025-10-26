@@ -149,3 +149,4 @@ Thumbs.db
 # Project
 claude-code-prompt.md
 backend/
+tests/results
